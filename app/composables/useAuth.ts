@@ -13,11 +13,13 @@ export const useAuth = () => {
       const response: any = await $fetch("/api/auth/register", {
         method: "POST",
         body: data,
+        credentials:'include'
       });
       user.value = response.user;
       return response;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       loading.value = false;
     }
@@ -30,11 +32,13 @@ export const useAuth = () => {
       const response: any = await $fetch("/api/auth/login", {
         method: "POST",
         body: data,
+        credentials:'include'
       });
       user.value = response.user;
       return response;
     } catch (error) {
       console.log("error");
+      throw error;
     } finally {
       loading.value = false;
     }
@@ -61,7 +65,8 @@ export const useAuth = () => {
     loading.value=true
     try {
         const response:any = await $fetch('/api/auth/me',{
-            method:"GET"
+            method:"GET",
+            credentials:'include'
         })
         user.value=response.user
         return response.user
@@ -78,7 +83,8 @@ export const useAuth = () => {
   const refreshToken=async()=>{
     try {
         const response:any = await $fetch('/api/auth/refresh',{
-            method:"POST"
+            method:"POST",
+            credentials:'include'
         })
         user.value=response.user
         return response.user
