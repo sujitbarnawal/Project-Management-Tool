@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-useSeo("Home","Welcome")
+useSeo("Register or Login","Welcome to TaskFLow")
 
 definePageMeta({
     layout:'auth',
@@ -9,5 +9,5 @@ definePageMeta({
 
 </script>
 <template>
-    hello
+    <p class="text-red-400">Hello</p>
 </template>

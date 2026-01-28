@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   css:["/assets/css/main.css"],
   app:{
     head:{
-      titleTemplate:"%s-Task Management",
+      titleTemplate:"%s-TaskFlow",
       meta:[
         {name:"description",content:"Task Management Tool"}
       ]
@@ -28,4 +28,5 @@ export default defineNuxtConfig({
       baseUrl: process.env.BASE_URL,
     },
   },
+  modules: ['@nuxtjs/tailwindcss'],
 })
