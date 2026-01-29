@@ -23,7 +23,7 @@ onMounted(async () => {
   <div class=" bg-gray-100">
     <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
       <div class="px-4 py-6 sm:px-0">
-        <h2 class="text-2xl font-bold mb-4">Welcome, {{ user?.name }}!</h2>
+        <h2 class="text-xl font-bold mb-4">Welcome, {{ user?.name }}!</h2>
       </div>
     </main>
   </div>

@@ -1,6 +1,12 @@
 export const useAuth = () => {
   const user = useState<any>("user", () => null);
   const loading = useState("authLoading", () => false);
+  const userCookie = useCookie("userCookie")
+
+  if(!user.value && userCookie.value){
+    user.value=userCookie.value
+  }
+
 
   //register user
   const register = async (data: {
@@ -16,6 +22,7 @@ export const useAuth = () => {
         credentials:'include'
       });
       user.value = response.user;
+      userCookie.value=response.user
       return response;
     } catch (error) {
       console.log(error);
@@ -35,6 +42,7 @@ export const useAuth = () => {
         credentials:'include'
       });
       user.value = response.user;
+      userCookie.value=response.user
       return response;
     } catch (error) {
       console.log("error");
@@ -52,6 +60,7 @@ export const useAuth = () => {
         method: "POST",
       });
       user.value = null;
+      userCookie.value=null;
       return response;
     } catch (error) {
       console.log("error");
