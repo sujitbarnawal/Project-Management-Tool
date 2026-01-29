@@ -3,7 +3,7 @@
 useSeo("Register or Login","Welcome to TaskFLow")
 
 definePageMeta({
-    // layout:'auth',
+    layout:'auth',
     middleware:'guest'
 })
 
