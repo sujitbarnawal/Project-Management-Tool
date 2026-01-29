@@ -96,6 +96,7 @@ export const useAuth = () => {
             credentials:'include'
         })
         user.value=response.user
+        userCookie.value=response.user
         return response.user
     } catch (error) {
         user.value=null

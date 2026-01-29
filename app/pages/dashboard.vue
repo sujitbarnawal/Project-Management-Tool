@@ -62,7 +62,7 @@ const handleDelete = async (id: string) => {
 </script>
 
 <template>
-  <div class=" relative bg-gray-100">
+  <div class=" relative bg-gray-100 p-2">
     <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
       <div class="flex justify-between">
         <h1 class="text-3xl font-semibold ">Workspaces</h1>
@@ -73,7 +73,7 @@ const handleDelete = async (id: string) => {
           </svg>
         </button>
       </div>
-      <div v-if="openCreate" class="fixed inset-0 flex items-center justify-center">
+      <div v-if="openCreate" class="fixed z-50 inset-0 flex items-center justify-center bg-black/30">
         <div class="w-[400px] bg-white rounded-lg px-6 py-4 shadow-lg">
           <h1 class="text-lg font-semibold mb-4">Add Workspace</h1>
 

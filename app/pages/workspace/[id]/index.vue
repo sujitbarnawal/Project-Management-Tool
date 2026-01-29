@@ -9,9 +9,7 @@ const handleLogout = async () => {
   await logout();
 };
 
-const goBack = () => {
-  navigateTo('/dashboard');
-};
+
 
 const getRoleBadgeClass = (role: string) => {
   switch (role) {
@@ -32,6 +30,7 @@ definePageMeta({
   middleware: 'auth',
   layout:'default'
 });
+useSeo("Workspace","Welcome to the workspace")
 </script>
 <template>
    

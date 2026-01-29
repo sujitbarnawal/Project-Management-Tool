@@ -5,10 +5,12 @@ export const useWorkspace=()=>{
     const currentWorkspace = useState<any>("currentWorkspace",()=>null)
     const loading = useState<boolean>("workspaceLoading",()=>false)
 
+    const {fetchWithAuth}=useApi()
+
     const fetchWorkspaces = async()=>{
         loading.value=true;
         try {
-            const response:any = await $fetch('/api/workspaces',{
+            const response:any = await fetchWithAuth('/api/workspaces',{
                 method:"GET",
                 credentials:"include"
             })
@@ -24,7 +26,7 @@ export const useWorkspace=()=>{
     const fetchWorkspaceById=async(id:string)=>{
         loading.value=true
         try {
-            const response = await $fetch(`/api/workspaces/${id}`,{
+            const response:any = await fetchWithAuth(`/api/workspaces/${id}`,{
                 method:"GET",
                 credentials:"include"
             })
@@ -42,7 +44,7 @@ export const useWorkspace=()=>{
     const createWorkspace = async(data:{name:string,description?:string})=>{
         loading.value=true;
         try {
-            const response:any=await $fetch('/api/workspaces',{
+            const response:any=await fetchWithAuth('/api/workspaces',{
                 method:"POST",
                 credentials:"include",
                 body:data
@@ -59,7 +61,7 @@ export const useWorkspace=()=>{
     const updateWorkspace=async(id:string,data:{name?:string,description?:string})=>{
         loading.value=true
         try {
-            const response:any = await $fetch(`/api/workspaces/${id}`,{
+            const response:any = await fetchWithAuth(`/api/workspaces/${id}`,{
                 method:"PATCH",
                 credentials:"include",
                 body:data
@@ -82,7 +84,7 @@ export const useWorkspace=()=>{
     const deleteWorkspace = async(id:string)=>{
         loading.value=true
         try {
-            const response:any = await $fetch(`/api/workspaces/${id}`,{
+            const response:any = await fetchWithAuth(`/api/workspaces/${id}`,{
                 method:"DELETE",
                 credentials:"include",
             })
