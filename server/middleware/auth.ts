@@ -1,7 +1,7 @@
 import { getUserFromToken } from "../utils/auth";
 export default defineEventHandler(async(event)=>{
     const url = getRequestURL(event)
-    const publicRoutes = ['/api/auth/register','/api/auth/login','/api/auth/refresh']
+    const publicRoutes = ['/api/auth/register','/api/auth/login','/api/auth/refresh','/api/test-db']
     if(publicRoutes.some((route)=>url.pathname.startsWith(route))){
         return;
     }
