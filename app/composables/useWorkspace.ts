@@ -48,7 +48,7 @@ export const useWorkspace=()=>{
                 body:data
             })
             workspaces.value.push(response?.workspace)
-            return response.workspace
+            return response
         } catch (error) {
             throw error;
         } finally{
@@ -66,7 +66,7 @@ export const useWorkspace=()=>{
             })
             const index = workspaces.value.findIndex(w=>w.id===id)
             if(index!==-1){
-                workspaces.value={...workspaces.value[index],...response.workspace}
+                workspaces.value[index]={...workspaces.value[index],...response.workspace}
             }
             if(currentWorkspace?.value.id===id){
                 currentWorkspace.value={...currentWorkspace.value,...response.workspace}

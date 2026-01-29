@@ -40,7 +40,7 @@ export type NewWorkspace = typeof workspaces.$inferInsert;
 export const workspaceMembers = pgTable(
   "workspaceMembers",
   {
-    workspaceId: uuid("workSpaceId")
+    workspaceId: uuid("workspaceId")
       .notNull()
       .references(() => workspaces.id, { onDelete: "cascade" }),
     userId: uuid("userId")
