@@ -1,3 +1,4 @@
+import { relations } from "drizzle-orm";
 import {
   integer,
   pgTable,
@@ -85,6 +86,15 @@ export const lists = pgTable("lists", {
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 });
+
+export const listRelations=relations(lists,({one,many})=>({
+  board:one(boards,{
+    fields:[lists.boardId],
+    references:[boards.id]
+  }),
+  tasks:many(tasks)
+}))
+
 export type List = typeof lists.$inferSelect;
 export type NewList = typeof lists.$inferInsert;
 
@@ -101,6 +111,16 @@ export const tasks = pgTable("tasks", {
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 });
+
+export const tasksRelations=relations(tasks,({one,many})=>({
+  list:one(lists,{
+    fields:[tasks.listId],
+    references:[lists.id]
+  }),
+  assignees:many(taskAssignees),
+  comments:many(comments),
+  attachments:many(attachments)
+}))
 
 export type Task = typeof tasks.$inferSelect;
 export type NewTAsk = typeof tasks.$inferSelect;
