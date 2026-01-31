@@ -61,6 +61,7 @@ export const useAuth = () => {
       });
       user.value = null;
       userCookie.value=null;
+      navigateTo('/')
       return response;
     } catch (error) {
       console.log("error");

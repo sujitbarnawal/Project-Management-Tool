@@ -23,7 +23,7 @@ export const useWorkspace=()=>{
         }
     }
 
-    const fetchWorkspaceById=async(id:string)=>{
+    const fetchWorkspace=async(id:string)=>{
         loading.value=true
         try {
             const response:any = await fetchWithAuth(`/api/workspaces/${id}`,{
@@ -102,7 +102,7 @@ export const useWorkspace=()=>{
 
     return{
         fetchWorkspaces,
-        fetchWorkspaceById,
+        fetchWorkspace,
         createWorkspace,
         updateWorkspace,
         deleteWorkspace,
