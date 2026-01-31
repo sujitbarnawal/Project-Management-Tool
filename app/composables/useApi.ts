@@ -22,7 +22,7 @@ export const useApi = () => {
             credentials: 'include',
           })
         } catch (refreshErr) {
-          console.log('Refresh failed, redirecting to login')
+          // console.log('Refresh failed, redirecting to login')
           window.location.href = '/'
           throw refreshErr
         }
