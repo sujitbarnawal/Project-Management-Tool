@@ -8,7 +8,7 @@ export const useBoard = () => {
   const fetchBoards = async (workspaceId: string) => {
     loading.value = true;
     try {
-      const response:any = await fetchWithAuth(`/api/boards/workspace/${workspaceId}`);
+      const response:any = await fetchWithAuth(`/api/workspaces/boards/${workspaceId}`);
       boards.value = response.boards;
       return response.boards;
     } catch (error: any) {
@@ -107,8 +107,8 @@ export const useBoard = () => {
   };
 
   return {
-    boards: readonly(boards),
-    currentBoard: readonly(currentBoard),
+    boards: boards,
+    currentBoard: currentBoard,
     loading: readonly(loading),
     fetchBoards,
     fetchBoard,

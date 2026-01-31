@@ -19,7 +19,6 @@ export default defineEventHandler(async (event) => {
       message: "Board ID is required",
     });
   }
-
   const board = await db.query.boards.findFirst({
     where: eq(boards.id, boardId),
   });

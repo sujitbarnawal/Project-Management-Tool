@@ -6,7 +6,6 @@ import { boards, workspaceMembers } from "~~/server/database/schema";
 export default defineEventHandler(async (event) => {
   const user = event.context.user;
   const workspaceId = getRouterParam(event, "workspaceId");
-
   if (!user) {
     throw createError({
       statusCode: 401,

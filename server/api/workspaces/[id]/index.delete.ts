@@ -1,6 +1,6 @@
-import { and, eq } from "drizzle-orm"
+import { eq } from "drizzle-orm"
 import { db } from "~~/server/database"
-import { workspaceMembers, workspaces } from "~~/server/database/schema"
+import {  workspaces } from "~~/server/database/schema"
 
 export default defineEventHandler(async(event)=>{
     const user = event.context.user
