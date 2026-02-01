@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen" :style="{ backgroundColor: currentBoard?.backgroundColor || '#0079BF' }">
-    <!-- Navbar -->
+
     <nav class="bg-black/20 backdrop-blur-sm border-b border-white/20">
       <div class="max-w-full px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-14">
@@ -19,7 +19,7 @@
       </div>
     </nav>
 
-    <!-- Board Content -->
+
     <main class="p-4 h-[calc(100vh-3.5rem)] overflow-x-auto">
       <div v-if="loading" class="text-center py-12 text-white">
         <svg class="animate-spin h-12 w-12 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -32,12 +32,12 @@
       </div>
 
       <div v-else class="flex space-x-4 h-full">
-        <!-- Lists -->
+
         <ListColumn v-for="list in currentBoard?.lists" :key="list.id" :list="list" @update="refetchBoard"
           @delete="handleDeleteList" @taskMoved="handleTaskMoved" @openTask="openTaskDetail"
           @taskDeleted="handleTaskDeleted" />
 
-        <!-- Add List -->
+
         <div class="flex-shrink-0 w-80">
           <div v-if="!isAddingList">
             <button @click="startAddList"
@@ -67,7 +67,7 @@
       </div>
     </main>
 
-    <!-- Task Detail Modal -->
+
     <TaskDetailModal :is-open="showTaskModal" :task="selectedTask" @close="closeTaskDetail" @updated="refetchBoard"
       @deleted="handleTaskDeleted" />
   </div>
@@ -97,12 +97,12 @@ const goBack = () => {
   }
 };
 
-// Refetch board data
+
 const refetchBoard = async () => {
   await fetchBoard(boardId);
 };
 
-// Add list
+
 const startAddList = () => {
   isAddingList.value = true;
   nextTick(() => listInput.value?.focus());
@@ -125,7 +125,7 @@ const cancelAddList = () => {
   newListTitle.value = '';
 };
 
-// Delete list
+
 const handleDeleteList = async (listId: string) => {
   try {
     await deleteList(listId);
@@ -135,7 +135,7 @@ const handleDeleteList = async (listId: string) => {
   }
 };
 
-// Handle task moved between lists
+
 const handleTaskMoved = ({ taskId, fromListId, toListId, newIndex }: any) => {
   const fromList = currentBoard.value.lists.find((l: any) => l.id === fromListId);
   const toList = currentBoard.value.lists.find((l: any) => l.id === toListId);
@@ -147,12 +147,12 @@ const handleTaskMoved = ({ taskId, fromListId, toListId, newIndex }: any) => {
   const [task] = fromList.tasks.splice(taskIndex, 1);
   toList.tasks.splice(newIndex, 0, task);
 
-  // Optionally: persist to backend
+
   updateTask(taskId, { listId: toListId, position: newIndex });
 };
 
 
-// Task detail modal
+
 const openTaskDetail = (task: any) => {
   selectedTask.value = task;
   showTaskModal.value = true;

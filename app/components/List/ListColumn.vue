@@ -1,8 +1,8 @@
 <template>
   <div class="flex-shrink-0 w-80 bg-gray-100 rounded-lg p-3 flex flex-col max-h-full relative">
-    <!-- List Header -->
+
     <div class="flex justify-between items-center mb-3 relative">
-      <!-- Title / Inline Edit -->
+
       <div class="flex-1">
         <div v-if="!isEditingTitle">
           <h3 class="font-semibold text-gray-900 cursor-pointer" @click="startEditTitle">
@@ -21,7 +21,7 @@
         </div>
       </div>
 
-      <!-- Three-dot menu -->
+
       <button @click="toggleMenu" class="p-1 hover:bg-gray-200 rounded">
         <svg class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
           <path
@@ -30,7 +30,7 @@
         </svg>
       </button>
 
-      <!-- Dropdown Menu -->
+
       <div
         v-if="showMenu"
         class="absolute right-0 top-full mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200"
@@ -50,7 +50,7 @@
       </div>
     </div>
 
-    <!-- Tasks -->
+
     <VueDraggable
       v-model="localTasks"
       :group="{ name: 'tasks', pull: true, put: true }"
@@ -70,12 +70,12 @@
       />
     </VueDraggable>
 
-    <!-- Empty State -->
+
     <div v-if="localTasks.length === 0" class="text-center py-4 text-gray-400 text-sm">
       No tasks yet
     </div>
 
-    <!-- Add Task -->
+
     <div v-if="!isAddingTask">
       <button
         @click="startAddTask"
@@ -88,7 +88,7 @@
       </button>
     </div>
 
-    <!-- Add Task Form -->
+
     <div v-else class="bg-white rounded-md shadow-sm p-2">
       <textarea
         ref="taskInput"
@@ -145,15 +145,15 @@ const taskInput = ref<HTMLTextAreaElement | null>(null);
 
 const localTasks = ref([...props.list.tasks]);
 
-// Watch for prop changes
+
 watch(() => props.list.tasks, (tasks) => {
   localTasks.value.splice(0, localTasks.value.length, ...(tasks || []));
 }, { deep: true });
 
-// Menu
+
 const toggleMenu = () => showMenu.value = !showMenu.value;
 
-// Edit list title
+
 const startEditTitle = () => {
   showMenu.value = false;
   editTitle.value = props.list.title;
@@ -178,7 +178,7 @@ const cancelEditTitle = () => {
   editTitle.value = '';
 };
 
-// Delete list
+
 const handleDeleteList = () => {
   showMenu.value = false;
   if (confirm(`Delete "${props.list.title}"? All tasks will be deleted.`)) {
@@ -186,7 +186,7 @@ const handleDeleteList = () => {
   }
 };
 
-// Add task
+
 const startAddTask = () => {
   isAddingTask.value = true;
   nextTick(() => taskInput.value?.focus());
@@ -210,7 +210,7 @@ const cancelAddTask = () => {
   newTaskTitle.value = '';
 };
 
-// Delete task
+
 const handleDeleteTask = async (taskId: string) => {
   try {
     await deleteTask(taskId);
@@ -221,7 +221,7 @@ const handleDeleteTask = async (taskId: string) => {
   }
 };
 
-// Drag & drop
+
 const handleDragEnd = (event: any) => {
   const fromListId = event.from.getAttribute('data-list-id');
   const toListId = event.to.getAttribute('data-list-id');
