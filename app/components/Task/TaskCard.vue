@@ -19,7 +19,6 @@
           <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
         </svg>
 
-        <!-- Dropdown -->
         <div
           v-if="showMenu"
           v-click-outside="() => showMenu = false"
@@ -35,7 +34,6 @@
       </button>
     </div>
 
-    <!-- Task Meta -->
     <div v-if="task.dueDate" class="flex items-center mt-2 text-xs text-gray-500">
       <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />

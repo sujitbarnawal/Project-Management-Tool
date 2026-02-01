@@ -5,7 +5,7 @@
 
       <div class="relative bg-white rounded-lg shadow-xl w-full max-w-4xl">
         <div class="p-6">
-          <!-- Header -->
+
           <div class="flex items-start justify-between mb-4">
             <div class="flex-1">
               <div class="flex items-start">
@@ -29,10 +29,10 @@
             </button>
           </div>
 
-          <!-- Main Grid -->
+
           <div class="grid grid-cols-3 gap-6">
             <div class="col-span-2 space-y-6">
-              <!-- Description -->
+
               <div>
                 <div class="flex items-center mb-2">
                   <svg class="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

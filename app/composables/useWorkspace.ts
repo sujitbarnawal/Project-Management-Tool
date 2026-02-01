@@ -100,6 +100,54 @@ export const useWorkspace=()=>{
         }
     }
 
+    // Invite member
+const inviteMember = async (workspaceId: string, email: string, role: string = 'member') => {
+  loading.value = true;
+  try {
+    const response: any = await fetchWithAuth(`/api/workspaces/${workspaceId}/members/invite`, {
+      method: 'POST',
+      body: { email, role },
+    });
+    return response;
+  } catch (error: any) {
+    throw error;
+  } finally {
+    loading.value = false;
+  }
+};
+
+// Remove member
+const removeMember = async (workspaceId: string, memberId: string) => {
+  loading.value = true;
+  try {
+    await fetchWithAuth(`/api/workspaces/${workspaceId}/members/${memberId}`, {
+      method: 'DELETE',
+    });
+    return true;
+  } catch (error: any) {
+    throw error;
+  } finally {
+    loading.value = false;
+  }
+};
+
+// Update member role
+const updateMemberRole = async (workspaceId: string, memberId: string, role: string) => {
+  loading.value = true;
+  try {
+    const response: any = await fetchWithAuth(`/api/workspaces/${workspaceId}/members/${memberId}`, {
+      method: 'PATCH',
+      body: { role },
+    });
+    return response;
+  } catch (error: any) {
+    throw error;
+  } finally {
+    loading.value = false;
+  }
+};
+
+
     return{
         fetchWorkspaces,
         fetchWorkspace,
@@ -108,6 +156,9 @@ export const useWorkspace=()=>{
         deleteWorkspace,
         workspaces,
         currentWorkspace,
+        inviteMember,
+        removeMember,
+        updateMemberRole,
         loading:readonly(loading)
     }
 

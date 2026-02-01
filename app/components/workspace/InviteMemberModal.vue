@@ -9,39 +9,45 @@
             <div class="sm:flex sm:items-start">
               <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
                 <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">
-                  {{ isEdit ? 'Edit Workspace' : 'Create New Workspace' }}
+                  Invite Member to Workspace
                 </h3>
 
                 <div v-if="error" class="mb-4 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
                   {{ error }}
                 </div>
 
+                <div v-if="success" class="mb-4 bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-md text-sm">
+                  {{ success }}
+                </div>
+
                 <div class="space-y-4">
                   <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
-                      Workspace Name *
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+                      Email Address *
                     </label>
                     <input
-                      id="name"
-                      v-model="form.name"
-                      type="text"
+                      id="email"
+                      v-model="form.email"
+                      type="email"
                       required
                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="My Workspace"
+                      placeholder="user@example.com"
                     />
+                    <p class="mt-1 text-xs text-gray-500">User must be registered in the system</p>
                   </div>
 
                   <div>
-                    <label for="description" class="block text-sm font-medium text-gray-700 mb-1">
-                      Description (Optional)
+                    <label for="role" class="block text-sm font-medium text-gray-700 mb-1">
+                      Role
                     </label>
-                    <textarea
-                      id="description"
-                      v-model="form.description"
-                      rows="3"
+                    <select
+                      id="role"
+                      v-model="form.role"
                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="Describe your workspace..."
-                    ></textarea>
+                    >
+                      <option value="member">Member - Can view and edit</option>
+                      <option value="admin">Admin - Can manage boards and invite members</option>
+                    </select>
                   </div>
                 </div>
               </div>
@@ -54,7 +60,7 @@
               :disabled="loading"
               class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
             >
-              {{ loading ? 'Saving...' : (isEdit ? 'Update' : 'Create') }}
+              {{ loading ? 'Inviting...' : 'Invite Member' }}
             </button>
             <button
               type="button"
@@ -77,67 +83,49 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  workspace: {
-    type: Object,
-    default: null,
+  workspaceId: {
+    type: String,
+    required: true,
   },
 });
 
-const emit = defineEmits(['close', 'created', 'updated']);
+const emit = defineEmits(['close', 'invited']);
 
-const { createWorkspace, updateWorkspace } = useWorkspace();
+const { inviteMember } = useWorkspace();
 
 const loading = ref(false);
 const error = ref('');
+const success = ref('');
 
 const form = reactive({
-  name: '',
-  description: '',
+  email: '',
+  role: 'member',
 });
 
-const isEdit = computed(() => !!props.workspace);
-
-// Watch for workspace prop changes
-watch(() => props.workspace, (newWorkspace) => {
-  if (newWorkspace) {
-    form.name = newWorkspace.name;
-    form.description = newWorkspace.description || '';
-  }
-}, { immediate: true });
-
-// Reset form when modal opens/closes
 watch(() => props.isOpen, (isOpen) => {
   if (!isOpen) {
-    form.name = '';
-    form.description = '';
+    form.email = '';
+    form.role = 'member';
     error.value = '';
-  } else if (props.workspace) {
-    form.name = props.workspace.name;
-    form.description = props.workspace.description || '';
+    success.value = '';
   }
 });
 
 const handleSubmit = async () => {
   loading.value = true;
   error.value = '';
+  success.value = '';
 
   try {
-    if (isEdit.value) {
-      const updated = await updateWorkspace(props.workspace.id, {
-        name: form.name,
-        description: form.description || undefined,
-      });
-      emit('updated', updated);
-    } else {
-      const created = await createWorkspace({
-        name: form.name,
-        description: form.description || undefined,
-      });
-      emit('created', created);
-    }
-    close();
+    const response = await inviteMember(props.workspaceId, form.email, form.role);
+    success.value = response.message;
+    emit('invited');
+
+    setTimeout(() => {
+      close();
+    }, 1500);
   } catch (e: any) {
-    error.value = e.data?.message || e.message || 'Something went wrong';
+    error.value = e.data?.message || e.message || 'Failed to invite member';
   } finally {
     loading.value = false;
   }

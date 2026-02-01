@@ -174,4 +174,6 @@ onMounted(async () => {
 definePageMeta({
   middleware: 'auth',
 });
+
+useSeo("Board","Welcome to board")
 </script>
