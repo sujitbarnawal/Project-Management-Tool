@@ -143,6 +143,18 @@ export const taskAssignees = pgTable(
     };
   },
 );
+
+export const taskAssigneesRelations = relations(taskAssignees,({one})=>({
+  task:one(tasks,{
+    fields:[taskAssignees.taskId],
+    references:[tasks.id]
+  }),
+  user:one(users,{
+    fields:[taskAssignees.userId],
+    references:[users.id]
+  })
+}))
+
 export type TaskAssignee = typeof taskAssignees.$inferSelect;
 export type NewTaskAssignee = typeof taskAssignees.$inferInsert;
 
@@ -159,6 +171,18 @@ export const comments = pgTable("comments", {
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 });
+
+export const commentsRelations=relations(comments,({one})=>({
+  task:one(tasks,{
+    fields:[comments.taskId],
+    references:[tasks.id]
+  }),
+  user:one(users,{
+    fields:[comments.userId],
+    references:[users.id]
+  })
+}))
+
 export type Comment = typeof comments.$inferSelect;
 export type NewComment = typeof comments.$inferInsert;
 
@@ -173,6 +197,14 @@ export const attachments = pgTable("attachments",{
     publicId:varchar("publicId",{length:255}),
     createdAt: timestamp("createdAt").notNull().defaultNow(),
 });
+
+export const attachmentsRelations = relations(attachments,({one})=>({
+  task:one(tasks,{
+    fields:[attachments.taskId],
+    references:[tasks.id]
+  })
+}))
+
 export type Attachment = typeof attachments.$inferSelect;
 export type NewAttachment = typeof attachments.$inferInsert;
 
