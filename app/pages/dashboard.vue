@@ -1,133 +1,146 @@
-<script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useAuth } from '@/composables/useAuth'
-import { useWorkspace } from '@/composables/useWorkspace'
-import { useSeo } from '@/composables/useSeo'
-
-useSeo('Dashboard', 'Your workspace dashboard')
-
-definePageMeta({
-  middleware: 'auth'
-})
-
-const { user, logout } = useAuth()
-const { workspaces, fetchWorkspaces, createWorkspace, updateWorkspace, deleteWorkspace, loading } = useWorkspace()
-
-
-const showCreateModal = ref(false)
-const showEditModal = ref(false)
-const workspaceToEdit = ref<any>(null)
-
-const newWorkspaceName = ref('')
-const newWorkspaceDescription = ref('')
-
-onMounted(async () => {
-  await fetchWorkspaces()
-})
-
-const handleCreateWorkspace = async () => {
-  if (!newWorkspaceName.value.trim()) return alert('Workspace name is required')
-  await createWorkspace({ name: newWorkspaceName.value, description: newWorkspaceDescription.value })
-  newWorkspaceName.value = ''
-  newWorkspaceDescription.value = ''
-  showCreateModal.value = false
-}
-
-const handleOpenEdit = (workspace: any) => {
-  workspaceToEdit.value = { ...workspace }
-  showEditModal.value = true
-}
-
-
-const handleUpdateWorkspace = async () => {
-  if (!workspaceToEdit.value.name.trim()) return alert('Workspace name is required')
-  await updateWorkspace(workspaceToEdit.value.id, { 
-    name: workspaceToEdit.value.name, 
-    description: workspaceToEdit.value.description 
-  })
-  showEditModal.value = false
-}
-
-
-const handleDeleteWorkspace = async (workspace: any) => {
-  if (confirm(`Are you sure you want to delete "${workspace.name}"?`)) {
-    await deleteWorkspace(workspace.id)
-  }
-}
-
-</script>
-
 <template>
-<section class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+          <div class="flex items-center">
+            <h1 class="text-xl font-bold text-gray-900">TaskFlow</h1>
+          </div>
+          <div class="flex items-center space-x-4">
+            <span class="text-sm text-gray-700">{{ user?.name }}</span>
+            <button
+              @click="handleLogout"
+              class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
 
-  <nav class="flex items-center justify-between px-6 py-4 bg-white shadow-md">
-    <h1 class="text-2xl font-bold text-blue-600">TaskFlow</h1>
-    <div class="flex items-center space-x-4">
-      <span class="font-medium text-gray-700">Hi, {{ user?.name }}</span>
-      <button @click="logout" class="px-3 py-1 rounded bg-red-500 text-white hover:bg-red-600 transition">Logout</button>
-    </div>
-  </nav>
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-8">
+        <div>
+          <h2 class="text-3xl font-bold text-gray-900">My Workspaces</h2>
+          <p class="mt-1 text-sm text-gray-600">Manage your workspaces and collaborate with your team</p>
+        </div>
+        <button
+          @click="openCreateModal"
+          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition flex items-center"
+        >
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          New Workspace
+        </button>
+      </div>
 
- 
-  <div class="max-w-6xl mx-auto px-6 py-8">
-    <div class="flex justify-between items-center mb-6">
-      <h2 class="text-xl font-semibold text-gray-700">Your Workspaces</h2>
-      <button @click="showCreateModal = true" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">+ Add New</button>
-    </div>
+      <!-- Loading State -->
+      <div v-if="loading" class="text-center py-12">
+        <svg class="animate-spin h-12 w-12 text-blue-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <p class="mt-4 text-gray-600">Loading workspaces...</p>
+      </div>
 
-    
-    <div v-if="workspaces.length" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      <div v-for="workspace in workspaces" :key="workspace.id" class="bg-white rounded-lg shadow hover:shadow-lg transition p-4 relative">
-        <h3 @click="navigateTo(`/workspace/${workspace.id}`)" class="text-lg hover:underline hover:cursor-pointer font-bold text-gray-800">{{ workspace.name }}</h3>
-        <p class="text-gray-500 text-sm mt-1">{{ workspace.description || 'No description' }}</p>
-
-        
-        <div class="absolute top-2 right-2">
-          <button @click="handleOpenEdit(workspace)" class="p-1 rounded hover:bg-gray-200">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 12h.01M12 12h.01M18 12h.01"/>
+      <!-- Empty State -->
+      <div v-else-if="!loading && workspaces.length === 0" class="text-center py-12 bg-white rounded-lg shadow-sm">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">No workspaces</h3>
+        <p class="mt-1 text-sm text-gray-500">Get started by creating a new workspace.</p>
+        <div class="mt-6">
+          <button
+            @click="openCreateModal"
+            class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+          >
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
-          </button>
-          <button @click="handleDeleteWorkspace(workspace)" class="p-1 rounded hover:bg-gray-200 ml-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
+            Create Workspace
           </button>
         </div>
       </div>
-    </div>
 
-    
-    <div v-else class="text-center text-gray-500 mt-20">
-      <p>You don't have any workspaces yet.</p>
-      <button @click="showCreateModal = true" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">+ Create Workspace</button>
-    </div>
-  </div>
-
-
-  <div v-if="showCreateModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
-      <h3 class="text-lg font-semibold mb-4">Create Workspace</h3>
-      <input v-model="newWorkspaceName" placeholder="Workspace Name" class="w-full mb-3 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-      <textarea v-model="newWorkspaceDescription" placeholder="Description (optional)" class="w-full mb-3 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-      <div class="flex justify-end space-x-3">
-        <button @click="showCreateModal = false" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 transition">Cancel</button>
-        <button @click="handleCreateWorkspace" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition">Create</button>
+      <!-- Workspaces Grid -->
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <WorkspaceCard
+          v-for="workspace in workspaces"
+          :key="workspace.id"
+          :workspace="workspace"
+          @edit="openEditModal"
+          @delete="handleDelete"
+        />
       </div>
-    </div>
-  </div>
+    </main>
 
-  
-  <div v-if="showEditModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
-      <h3 class="text-lg font-semibold mb-4">Edit Workspace</h3>
-      <input v-model="workspaceToEdit.name" placeholder="Workspace Name" class="w-full mb-3 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-      <textarea v-model="workspaceToEdit.description" placeholder="Description (optional)" class="w-full mb-3 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-      <div class="flex justify-end space-x-3">
-        <button @click="showEditModal = false" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 transition">Cancel</button>
-        <button @click="handleUpdateWorkspace" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition">Update</button>
-      </div>
-    </div>
+    <!-- Create/Edit Modal -->
+    <CreateWorkspaceModal
+      :is-open="showModal"
+      :workspace="selectedWorkspace!"
+      @close="closeModal"
+      @created="handleCreated"
+      @updated="handleUpdated"
+    />
   </div>
-</section>
 </template>
+
+<script setup lang="ts">
+import CreateWorkspaceModal from '~/components/workspace/CreateWorkspaceModal.vue';
+
+const { user, logout } = useAuth();
+const { workspaces, loading, fetchWorkspaces, deleteWorkspace } = useWorkspace();
+
+const showModal = ref(false);
+const selectedWorkspace = ref(null);
+
+const handleLogout = async () => {
+  await logout();
+};
+
+const openCreateModal = () => {
+  selectedWorkspace.value = null;
+  showModal.value = true;
+};
+
+const openEditModal = (workspace: any) => {
+  selectedWorkspace.value = workspace;
+  showModal.value = true;
+};
+
+const closeModal = () => {
+  showModal.value = false;
+  selectedWorkspace.value = null;
+};
+
+const handleCreated = () => {
+  // Workspace already added to list by composable
+};
+
+const handleUpdated = () => {
+  // Workspace already updated in list by composable
+};
+
+const handleDelete = async (workspaceId: string) => {
+  try {
+    await deleteWorkspace(workspaceId);
+  } catch (error: any) {
+    alert(error.data?.message || 'Failed to delete workspace');
+  }
+};
+
+// Fetch workspaces on mount
+onMounted(async () => {
+  await fetchWorkspaces();
+});
+
+definePageMeta({
+  middleware: 'auth',
+});
+</script>

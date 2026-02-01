@@ -105,7 +105,7 @@ export const tasks = pgTable("tasks", {
     .notNull()
     .references(() => lists.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
-  description: text("title"),
+  description: text("description"),
   position: integer("position").notNull().default(0),
   dueDate: timestamp("dueDate"),
   createdAt: timestamp("createdAt").notNull().defaultNow(),

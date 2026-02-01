@@ -1,108 +1,177 @@
-<script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useSeo } from '@/composables/useSeo'
-import { useBoard } from '@/composables/useBoard'
-import { useWorkspace } from '@/composables/useWorkspace'
-
-// SEO
-useSeo('Board', 'Manage your tasks and lists')
-
-// Page meta
-definePageMeta({
-  middleware: 'auth'
-})
-
-const route = useRoute()
-const router = useRouter()
-const boardId = route.params.id as string
-
-// Composables
-const { fetchBoard, currentBoard, boards, loading: boardLoading } = useBoard()
-const { currentWorkspace } = useWorkspace()
-
-// Modals
-const showCreateListModal = ref(false)
-const newListTitle = ref('')
-const lists = ref<any[]>([]) // just for UI
-
-// Load board and populate lists placeholder
-onMounted(async () => {
-  await fetchBoard(boardId)
-  // For now, dummy lists UI
-  lists.value = currentBoard.value?.lists || []
-})
-
-// Add List (UI only)
-const handleCreateList = () => {
-  if (!newListTitle.value.trim()) return alert('List title is required')
-  lists.value.push({
-    id: Date.now(),
-    title: newListTitle.value,
-    tasks: []
-  })
-  newListTitle.value = ''
-  showCreateListModal.value = false
-}
-
-// Add Task to a List (UI only)
-const handleAddTask = (list: any) => {
-  const taskTitle = prompt('Enter task title')
-  if (taskTitle && taskTitle.trim() !== '') {
-    list.tasks.push({ id: Date.now(), title: taskTitle })
-  }
-}
-</script>
-
 <template>
-<section class="min-h-screen bg-gray-100">
-  <!-- Navbar -->
-  <nav class="flex items-center justify-between px-6 py-4 bg-white shadow-md">
-    <h1 class="text-2xl font-bold text-blue-600 cursor-pointer" @click="router.push('/dashboard')">TaskFlow</h1>
-    <h2 class="text-gray-700 font-medium">{{ currentBoard?.name || 'Board' }}</h2>
-  </nav>
-
-  <div class="px-6 py-8 max-w-7xl mx-auto">
-    <!-- Workspace info -->
-    <div class="mb-6 flex justify-between items-center">
-      <h3 class="text-lg font-semibold text-gray-700">Workspace: {{ currentWorkspace?.name }}</h3>
-      <button @click="showCreateListModal = true" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">+ Create List</button>
-    </div>
-
-    <!-- Lists Container -->
-    <div class="flex space-x-6 overflow-x-auto pb-6">
-      <div v-for="list in lists" :key="list.id" class="bg-white rounded-lg shadow p-4 w-64 flex-shrink-0">
-        <div class="flex justify-between items-center mb-3">
-          <h4 class="font-semibold text-gray-700">{{ list.title }}</h4>
-          <button @click="list.tasks = []" class="text-gray-400 hover:text-red-500">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-          </button>
-        </div>
-
-        <!-- Tasks -->
-        <div class="space-y-2">
-          <div v-for="task in list.tasks" :key="task.id" class="bg-gray-50 p-2 rounded shadow cursor-pointer hover:bg-gray-100 transition">
-            {{ task.title }}
+  <div class="min-h-screen" :style="{ backgroundColor: currentBoard?.backgroundColor || '#0079BF' }">
+    <!-- Navbar -->
+    <nav class="bg-black/20 backdrop-blur-sm border-b border-white/20">
+      <div class="max-w-full px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-14">
+          <div class="flex items-center space-x-4">
+            <button @click="goBack" class="text-white hover:text-white/80">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+            </button>
+            <h1 class="text-xl font-bold text-white">{{ currentBoard?.name }}</h1>
+          </div>
+          <div class="flex items-center space-x-4">
+            <span class="text-sm text-white">{{ user?.name }}</span>
           </div>
         </div>
-
-        <button @click="handleAddTask(list)" class="mt-3 w-full text-left text-blue-600 font-medium hover:underline">+ Add Task</button>
       </div>
-    </div>
-  </div>
+    </nav>
 
-  <!-- Create List Modal -->
-  <div v-if="showCreateListModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
-      <h3 class="text-lg font-semibold mb-4">Create List</h3>
-      <input v-model="newListTitle" placeholder="List Title" class="w-full mb-3 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-      <div class="flex justify-end space-x-3">
-        <button @click="showCreateListModal = false" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 transition">Cancel</button>
-        <button @click="handleCreateList" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition">Create</button>
+    <!-- Board Content -->
+    <main class="p-4 h-[calc(100vh-3.5rem)] overflow-x-auto">
+      <div v-if="loading" class="text-center py-12 text-white">
+        <svg class="animate-spin h-12 w-12 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+          </path>
+        </svg>
+        <p class="mt-4">Loading board...</p>
       </div>
-    </div>
+
+      <div v-else class="flex space-x-4 h-full">
+        <!-- Lists -->
+        <ListColumn v-for="list in currentBoard?.lists" :key="list.id" :list="list" @update="refetchBoard"
+          @delete="handleDeleteList" @taskMoved="handleTaskMoved" @openTask="openTaskDetail"
+          @taskDeleted="handleTaskDeleted" />
+
+        <!-- Add List -->
+        <div class="flex-shrink-0 w-80">
+          <div v-if="!isAddingList">
+            <button @click="startAddList"
+              class="w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg p-3 text-white font-medium transition flex items-center justify-center">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              Add another list
+            </button>
+          </div>
+
+          <div v-else class="bg-gray-100 rounded-lg p-3">
+            <input ref="listInput" v-model="newListTitle" @keyup.enter="addList" @keyup.esc="cancelAddList"
+              placeholder="Enter list title..."
+              class="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <div class="flex items-center mt-2 gap-2">
+              <button @click="addList" :disabled="!newListTitle.trim()"
+                class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 disabled:opacity-50">
+                Add List
+              </button>
+              <button @click="cancelAddList" class="px-3 py-1 text-sm text-gray-700 hover:text-gray-900">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Task Detail Modal -->
+    <TaskDetailModal :is-open="showTaskModal" :task="selectedTask" @close="closeTaskDetail" @updated="refetchBoard"
+      @deleted="handleTaskDeleted" />
   </div>
-</section>
 </template>
+
+<script setup lang="ts">
+const route = useRoute();
+const { user } = useAuth();
+const { currentBoard, loading, fetchBoard } = useBoard();
+const { createList, deleteList } = useList();
+const { updateTask } = useTask();
+
+const boardId = route.params.id as string;
+
+const isAddingList = ref(false);
+const newListTitle = ref('');
+const listInput = ref<HTMLInputElement | null>(null);
+
+const showTaskModal = ref(false);
+const selectedTask = ref<any>(null);
+
+const goBack = () => {
+  if (currentBoard.value?.workspaceId) {
+    navigateTo(`/workspace/${currentBoard.value.workspaceId}`);
+  } else {
+    navigateTo('/dashboard');
+  }
+};
+
+// Refetch board data
+const refetchBoard = async () => {
+  await fetchBoard(boardId);
+};
+
+// Add list
+const startAddList = () => {
+  isAddingList.value = true;
+  nextTick(() => listInput.value?.focus());
+};
+
+const addList = async () => {
+  if (!newListTitle.value.trim()) return;
+  try {
+    await createList({ boardId, title: newListTitle.value.trim() });
+    newListTitle.value = '';
+    isAddingList.value = false;
+    await refetchBoard();
+  } catch (error: any) {
+    alert(error.data?.message || 'Failed to create list');
+  }
+};
+
+const cancelAddList = () => {
+  isAddingList.value = false;
+  newListTitle.value = '';
+};
+
+// Delete list
+const handleDeleteList = async (listId: string) => {
+  try {
+    await deleteList(listId);
+    await refetchBoard();
+  } catch (error: any) {
+    alert(error.data?.message || 'Failed to delete list');
+  }
+};
+
+// Handle task moved between lists
+const handleTaskMoved = ({ taskId, fromListId, toListId, newIndex }: any) => {
+  const fromList = currentBoard.value.lists.find((l: any) => l.id === fromListId);
+  const toList = currentBoard.value.lists.find((l: any) => l.id === toListId);
+  if (!fromList || !toList) return;
+  
+  const taskIndex = fromList.tasks.findIndex((t: any) => t.id === taskId);
+  if (taskIndex === -1) return;
+
+  const [task] = fromList.tasks.splice(taskIndex, 1);
+  toList.tasks.splice(newIndex, 0, task);
+
+  // Optionally: persist to backend
+  updateTask(taskId, { listId: toListId, position: newIndex });
+};
+
+
+// Task detail modal
+const openTaskDetail = (task: any) => {
+  selectedTask.value = task;
+  showTaskModal.value = true;
+};
+
+const closeTaskDetail = () => {
+  showTaskModal.value = false;
+  selectedTask.value = null;
+};
+
+const handleTaskDeleted = async () => {
+  await refetchBoard();
+};
+
+onMounted(async () => {
+  await fetchBoard(boardId);
+});
+
+definePageMeta({
+  middleware: 'auth',
+});
+</script>
