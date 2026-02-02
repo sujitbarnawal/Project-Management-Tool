@@ -1,0 +1,110 @@
+import { db } from "~~/server/database";
+import { taskAssignees, tasks, lists, boards, workspaceMembers } from "~~/server/database/schema";
+import { eq, and } from "drizzle-orm";
+
+export default defineEventHandler(async (event) => {
+  const user = event.context.user;
+  const taskId = getRouterParam(event, "id");
+  const userId = getRouterParam(event, "userId");
+
+  if (!user) {
+    throw createError({
+      statusCode: 401,
+      message: "Unauthorized",
+    });
+  }
+
+  if (!taskId || !userId) {
+    throw createError({
+      statusCode: 400,
+      message: "Task ID and User ID are required",
+    });
+  }
+
+
+  const task = await db.query.tasks.findFirst({
+    where: eq(tasks.id, taskId),
+  });
+
+  if (!task) {
+    throw createError({
+      statusCode: 404,
+      message: "Task not found",
+    });
+  }
+
+  const list = await db.query.lists.findFirst({
+    where: eq(lists.id, task.listId),
+  });
+
+  if (!list) {
+    throw createError({
+      statusCode: 404,
+      message: "List not found",
+    });
+  }
+
+  const board = await db.query.boards.findFirst({
+    where: eq(boards.id, list.boardId),
+  });
+
+  if (!board) {
+    throw createError({
+      statusCode: 404,
+      message: "Board not found",
+    });
+  }
+
+  const member = await db.query.workspaceMembers.findFirst({
+    where: and(
+      eq(workspaceMembers.workspaceId, board.workspaceId),
+      eq(workspaceMembers.userId, user.id)
+    ),
+  });
+
+  if (!member) {
+    throw createError({
+      statusCode: 403,
+      message: "You do not have access to this task",
+    });
+  }
+
+  const userToAssign = await db.query.workspaceMembers.findFirst({
+    where: and(
+      eq(workspaceMembers.workspaceId, board.workspaceId),
+      eq(workspaceMembers.userId, userId)
+    ),
+  });
+
+  if (!userToAssign) {
+    throw createError({
+      statusCode: 400,
+      message: "User is not a member of this workspace",
+    });
+  }
+
+  const existing = await db.query.taskAssignees.findFirst({
+    where: and(
+      eq(taskAssignees.taskId, taskId),
+      eq(taskAssignees.userId, userId)
+    ),
+  });
+
+  if (existing) {
+    throw createError({
+      statusCode: 400,
+      message: "User is already assigned to this task",
+    });
+  }
+
+  // Assign user
+  await db.insert(taskAssignees).values({
+    taskId: taskId,
+    userId: userId,
+  });
+
+  return {
+    success: true,
+    message: "User assigned to task successfully",
+  };
+});
