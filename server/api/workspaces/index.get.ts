@@ -1,4 +1,4 @@
-import { eq, or } from "drizzle-orm";
+import { eq, or, and } from "drizzle-orm";
 import { db } from "~~/server/database";
 import { workspaceMembers, workspaces } from "~~/server/database/schema";
 
@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
       role: workspaceMembers.role,
     })
     .from(workspaces)
-    .leftJoin(workspaceMembers, eq(workspaces.id, workspaceMembers.workspaceId))
+    .leftJoin(workspaceMembers, and(eq(workspaces.id, workspaceMembers.workspaceId), eq(workspaceMembers.userId, user.id)))
     .where(
       or(eq(workspaces.ownerId, user.id), eq(workspaceMembers.userId, user.id)),
     );

@@ -18,8 +18,8 @@ export const useBoard = () => {
     }
   };
 
-  const fetchBoard = async (id: string) => {
-    loading.value = true;
+  const fetchBoard = async (id: string, isBackground: boolean = false) => {
+    if (!isBackground) loading.value = true;
     try {
       const response:any = await fetchWithAuth(`/api/boards/${id}`);
       currentBoard.value = response.board;
@@ -27,7 +27,7 @@ export const useBoard = () => {
     } catch (error: any) {
       throw error;
     } finally {
-      loading.value = false;
+      if (!isBackground) loading.value = false;
     }
   };
 

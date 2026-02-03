@@ -4,7 +4,14 @@ import { users } from "~~/server/database/schema"
 
 export default defineEventHandler(async(event)=>{
     const body = await readBody(event)
-    const validatedData =  loginSchema.parse(body)
+    const result = loginSchema.safeParse(body)
+    if(!result.success){
+        throw createError({
+            statusCode:400,
+            statusMessage: result.error.issues[0]!.message
+        })
+    }
+    const validatedData = result.data
     const existingUser= await db.query.users.findFirst({
         where:eq(users.email,validatedData.email)
     })
