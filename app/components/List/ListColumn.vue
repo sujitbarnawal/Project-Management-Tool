@@ -1,11 +1,11 @@
 <template>
-  <div class="flex-shrink-0 w-80 bg-gray-100 rounded-lg p-3 flex flex-col max-h-full relative">
+  <div class="flex-shrink-0 w-80 bg-[#f1f2f4] rounded-xl p-3 flex flex-col max-h-full min-h-[calc(100vh-100px)] relative shadow-sm border border-white/20">
 
-    <div class="flex justify-between items-center mb-3 relative">
+    <div class="flex justify-between items-center mb-3 px-1 pt-1 relative group/header">
 
-      <div class="flex-1">
+      <div class="flex-1 min-w-0">
         <div v-if="!isEditingTitle">
-          <h3 class="font-semibold text-gray-900 cursor-pointer" @click="startEditTitle">
+          <h3 class="font-bold text-gray-700 text-sm cursor-pointer px-2 py-1 -ml-2 rounded-md hover:bg-gray-200 transition-colors truncate" @click="startEditTitle">
             {{ list.title }}
           </h3>
         </div>
@@ -16,34 +16,34 @@
             @blur="saveTitle"
             @keyup.enter="saveTitle"
             @keyup.esc="cancelEditTitle"
-            class="w-full px-2 py-1 text-sm font-semibold border border-blue-500 rounded focus:outline-none"
+            class="w-full px-2 py-1 text-sm font-bold border-2 border-indigo-500 rounded-md focus:outline-none"
           />
         </div>
       </div>
 
 
-      <button @click="toggleMenu" class="p-1 hover:bg-gray-200 rounded">
-        <svg class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
-          <path
-            d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"
-          />
+      <button @click="toggleMenu" class="p-1.5 text-gray-500 hover:bg-gray-200 rounded-md opacity-0 group-hover/header:opacity-100 transition-opacity">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
         </svg>
       </button>
 
 
       <div
         v-if="showMenu"
-        class="absolute right-0 top-full mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200"
+        v-click-outside="() => showMenu = false"
+        class="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl z-20 border border-gray-100 overflow-hidden"
       >
         <button
           @click="startEditTitle"
-          class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+          class="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
         >
-          Edit list
+          Rename list
         </button>
+        <div class="h-px bg-gray-100 my-1"></div>
         <button
           @click="handleDeleteList"
-          class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+          class="block w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
         >
           Delete list
         </button>
@@ -56,7 +56,7 @@
       :group="{ name: 'tasks', pull: true, put: true }"
       :data-list-id="list.id"
       @end="handleDragEnd"
-      class="flex-1 overflow-y-auto space-y-2 mb-2 min-h-[20px]"
+      class="flex-1 overflow-y-auto overflow-x-hidden space-y-2.5 mb-2 min-h-[10px] pr-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent"
       ghost-class="ghost"
       drag-class="dragging"
     >
@@ -71,44 +71,43 @@
     </VueDraggable>
 
 
-    <div v-if="localTasks.length === 0" class="text-center py-4 text-gray-400 text-sm">
-      No tasks yet
-    </div>
-
-
     <div v-if="!isAddingTask">
       <button
         @click="startAddTask"
-        class="w-full px-3 py-2 text-sm text-gray-600 hover:bg-gray-200 rounded transition flex items-center"
+        class="w-full px-2 py-2 text-sm text-gray-600 hover:bg-gray-200 hover:text-gray-800 rounded-lg transition-colors flex items-center mb-1 group"
       >
-        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-4 h-4 mr-2 text-gray-500 group-hover:text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
         </svg>
-        Add a card
+        Add a task
       </button>
     </div>
 
 
-    <div v-else class="bg-white rounded-md shadow-sm p-2">
+    <div v-else class="bg-white rounded-lg shadow-sm border border-indigo-200 p-2 animate-fade-in-up">
       <textarea
         ref="taskInput"
         v-model="newTaskTitle"
         @keyup.enter.exact="addTask"
         @keyup.esc="cancelAddTask"
-        placeholder="Enter task title..."
-        class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
-        rows="2"
+        placeholder="Enter a title for this card..."
+        class="w-full px-2 py-1.5 text-sm border-0 focus:ring-0 resize-none placeholder-gray-400"
+        rows="3"
       ></textarea>
-      <div class="flex items-center mt-2 gap-2">
+      <div class="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
         <button
           @click="addTask"
-          :disabled="!newTaskTitle.trim()"
-          class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 disabled:opacity-50"
+          :disabled="!newTaskTitle.trim() || loadingAddTask"
+          class="px-3 py-1.5 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 disabled:opacity-50 transition-colors shadow-sm flex items-center gap-2"
         >
-          Add
+          <svg v-if="loadingAddTask" class="animate-spin w-3 h-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          {{ loadingAddTask ? 'Adding...' : 'Add Card' }}
         </button>
-        <button @click="cancelAddTask" class="px-3 py-1 text-sm text-gray-600 hover:text-gray-900">
-          Cancel
+        <button @click="cancelAddTask" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
       </div>
     </div>
@@ -143,6 +142,9 @@ const isAddingTask = ref(false);
 const newTaskTitle = ref('');
 const taskInput = ref<HTMLTextAreaElement | null>(null);
 
+const loadingAddTask = ref(false);
+const loadingUpdateTitle = ref(false);
+
 const localTasks = ref([...props.list.tasks]);
 
 
@@ -163,11 +165,14 @@ const startEditTitle = () => {
 
 const saveTitle = async () => {
   if (editTitle.value.trim() && editTitle.value !== props.list.title) {
+    loadingUpdateTitle.value = true;
     try {
       await updateList(props.list.id, { title: editTitle.value.trim() });
       emit('update');
     } catch (error: any) {
       alert(error.data?.message || 'Failed to update list');
+    } finally {
+      loadingUpdateTitle.value = false;
     }
   }
   isEditingTitle.value = false;
@@ -194,6 +199,7 @@ const startAddTask = () => {
 
 const addTask = async () => {
   if (!newTaskTitle.value.trim()) return;
+  loadingAddTask.value = true;
   try {
     const task = await createTask({ listId: props.list.id, title: newTaskTitle.value.trim() });
     localTasks.value.push(task);
@@ -202,6 +208,8 @@ const addTask = async () => {
     emit('update');
   } catch (error: any) {
     alert(error.data?.message || 'Failed to create task');
+  } finally {
+    loadingAddTask.value = false;
   }
 };
 
