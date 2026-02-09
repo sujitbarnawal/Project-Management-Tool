@@ -1,6 +1,7 @@
 import { db } from "~~/server/database";
 import { tasks, lists, boards, workspaceMembers } from "~~/server/database/schema";
 import { eq, and } from "drizzle-orm";
+import { createActivityLog } from "~~/server/utils/activity";
 
 export default defineEventHandler(async (event) => {
   const user = event.context.user;
@@ -72,6 +73,19 @@ export default defineEventHandler(async (event) => {
 
 
   await db.delete(tasks).where(eq(tasks.id, taskId));
+
+  await createActivityLog(
+    board.workspaceId,
+    user.id,
+    "deleted",
+    "task",
+    taskId,
+    {
+      taskTitle: task.title,
+      listId: list.id,
+      boardId: board.id
+    }
+  );
 
   return {
     success: true,

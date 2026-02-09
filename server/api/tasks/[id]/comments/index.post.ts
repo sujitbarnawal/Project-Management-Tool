@@ -2,6 +2,7 @@ import { z } from "zod";
 import { db } from "~~/server/database";
 import { comments, tasks, lists, boards, workspaceMembers } from "~~/server/database/schema";
 import { eq, and } from "drizzle-orm";
+import { createActivityLog } from "~~/server/utils/activity";
 
 const createCommentSchema = z.object({
   content: z.string().min(1, "Comment cannot be empty").max(2000),
@@ -84,6 +85,20 @@ export default defineEventHandler(async (event) => {
         content: data.content,
       })
       .returning();
+
+    if (newComment) {
+        await createActivityLog(
+        board.workspaceId,
+        user.id,
+        "commented",
+        "task",
+        taskId,
+        {
+            commentId: newComment.id,
+            content: newComment.content.substring(0, 50) + (newComment.content.length > 50 ? "..." : "")
+        }
+        );
+    }
 
     return {
       success: true,

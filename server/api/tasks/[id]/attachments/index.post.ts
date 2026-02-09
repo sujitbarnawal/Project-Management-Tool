@@ -2,6 +2,7 @@ import { db } from "~~/server/database";
 import { attachments, tasks, lists, boards, workspaceMembers } from "~~/server/database/schema";
 import { eq, and } from "drizzle-orm";
 import { uploadToCloudinary } from "~~/server/utils/cloudinary";
+import { createActivityLog } from "~~/server/utils/activity";
 
 export default defineEventHandler(async (event) => {
   const user = event.context.user;
@@ -96,6 +97,20 @@ export default defineEventHandler(async (event) => {
         publicId: uploadResult.publicId,
       })
       .returning();
+
+    if (newAttachment) {
+        await createActivityLog(
+        board.workspaceId,
+        user.id,
+        "attached",
+        "task",
+        taskId,
+        {
+            attachmentId: newAttachment.id,
+            filename: newAttachment.filename,
+        }
+        );
+    }
 
     return {
       success: true,

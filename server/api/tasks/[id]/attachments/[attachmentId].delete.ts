@@ -2,6 +2,7 @@ import { db } from "~~/server/database";
 import { attachments, tasks, lists, boards, workspaceMembers } from "~~/server/database/schema";
 import { eq, and } from "drizzle-orm";
 import { deleteFromCloudinary } from "~~/server/utils/cloudinary";
+import { createActivityLog } from "~~/server/utils/activity";
 
 export default defineEventHandler(async (event) => {
   const user = event.context.user;
@@ -88,6 +89,19 @@ export default defineEventHandler(async (event) => {
   }
 
   await db.delete(attachments).where(eq(attachments.id, attachmentId));
+
+  await createActivityLog(
+    board.workspaceId,
+    user.id,
+    "deleted",
+    "task",
+    task.id,
+    {
+      attachmentId: attachmentId,
+      filename: attachment.filename,
+      type: "attachment"
+    }
+  );
 
   return {
     success: true,

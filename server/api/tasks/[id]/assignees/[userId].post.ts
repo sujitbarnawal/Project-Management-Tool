@@ -1,6 +1,7 @@
 import { db } from "~~/server/database";
 import { taskAssignees, tasks, lists, boards, workspaceMembers } from "~~/server/database/schema";
 import { eq, and } from "drizzle-orm";
+import { createActivityLog } from "~~/server/utils/activity";
 
 export default defineEventHandler(async (event) => {
   const user = event.context.user;
@@ -102,6 +103,17 @@ export default defineEventHandler(async (event) => {
     taskId: taskId,
     userId: userId,
   });
+
+  await createActivityLog(
+    board.workspaceId,
+    user.id,
+    "assigned",
+    "task",
+    taskId,
+    {
+      assignedUserId: userId,
+    }
+  );
 
   return {
     success: true,
