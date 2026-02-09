@@ -44,6 +44,54 @@
                       Description
                    </div>
                 </div>
+                <!-- Attachments Section -->
+                <div class="mb-8">
+                  <div class="flex items-center justify-between mb-3">
+                     <div class="text-gray-700 font-semibold text-lg flex items-center gap-2">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                        Attachments
+                     </div>
+                     <label class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium rounded-lg cursor-pointer transition-colors flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Add
+                        <input type="file" @change="handleFileUpload" class="hidden" />
+                     </label>
+                  </div>
+                  
+                  <div v-if="uploadingAttachment" class="flex items-center gap-2 text-sm text-gray-500 mb-3 ml-7">
+                      <svg class="animate-spin w-4 h-4 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Uploading...
+                  </div>
+
+                  <div v-if="taskData?.attachments?.length > 0" class="space-y-2 ml-7">
+                    <div v-for="attachment in taskData.attachments" :key="attachment.id" class="flex items-center justify-between p-3 bg-gray-50 border border-gray-100 rounded-xl hover:bg-gray-100 transition-colors group">
+                        <a :href="attachment.url" target="_blank" class="flex items-center gap-3 flex-1 min-w-0">
+                             <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                             </div>
+                             <div class="truncate">
+                                 <p class="text-sm font-medium text-gray-900 truncate">{{ attachment.filename }}</p>
+                                 <p class="text-xs text-gray-500">Added {{ formatDate(attachment.createdAt) }}</p>
+                             </div>
+                        </a>
+                        <button 
+                            @click="deleteAttachment(attachment.id)" 
+                            class="p-2 text-gray-400 hover:text-red-500 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                            :disabled="deletingAttachmentId === attachment.id"
+                        >
+                             <svg v-if="deletingAttachmentId === attachment.id" class="animate-spin w-4 h-4 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                             </svg>
+                             <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </div>
+                  </div>
+                  <div v-else class="ml-7 text-sm text-gray-400 italic">No attachments yet</div>
+                </div>
                 <div class="ml-7">
                     <textarea
                     v-model="localTask.description"
@@ -58,12 +106,55 @@
 
               <!-- Comments -->
               <div>
-                <div class="flex items-center mb-4 justify-between">
-                   <div class="text-gray-700 font-semibold text-lg flex items-center gap-2">
-                      <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path></svg>
-                      Activity
+                   <div class="flex gap-4 border-b border-gray-100 mb-6">
+                      <button 
+                        @click="activeTab = 'comments'"
+                        :class="['pb-3 text-sm font-semibold transition-colors relative', activeTab === 'comments' ? 'text-indigo-600' : 'text-gray-500 hover:text-gray-700']"
+                      >
+                          Comments
+                          <span v-if="activeTab === 'comments'" class="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-600 rounded-t-full"></span>
+                      </button>
+                      <button 
+                        @click="activeTab = 'history'"
+                        :class="['pb-3 text-sm font-semibold transition-colors relative', activeTab === 'history' ? 'text-indigo-600' : 'text-gray-500 hover:text-gray-700']"
+                      >
+                          History
+                          <span v-if="activeTab === 'history'" class="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-600 rounded-t-full"></span>
+                      </button>
                    </div>
                 </div>
+                
+                <!-- History Tab -->
+                <div v-if="activeTab === 'history'" class="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+                    <div v-if="loadingActivities" class="text-center py-4">
+                        <svg class="animate-spin h-6 w-6 text-indigo-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </div>
+                    <div v-else-if="activities.length > 0" class="space-y-4">
+                        <div v-for="activity in activities" :key="activity.id" class="flex gap-3">
+                             <div class="mt-0.5">
+                                 <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-600">
+                                     {{ activity.userName?.charAt(0).toUpperCase() }}
+                                 </div>
+                             </div>
+                             <div class="flex-1">
+                                 <p class="text-sm text-gray-900">
+                                     <span class="font-semibold">{{ activity.userName }}</span> 
+                                     <span class="text-gray-600">{{ formatActivity(activity) }}</span>
+                                 </p>
+                                 <p class="text-xs text-gray-400 mt-0.5">{{ formatDate(activity.createdAt) }}</p>
+                             </div>
+                        </div>
+                    </div>
+                    <div v-else class="text-center text-sm text-gray-500 py-4 italic">
+                        No activity recorded yet
+                    </div>
+                </div>
+
+                <!-- Comments Tab -->
+                <div v-if="activeTab === 'comments'">
 
                 <div class="flex gap-4 mb-6">
                     <div class="flex-shrink-0">
@@ -208,6 +299,16 @@
                             </button>
                         </div>
                         <p v-else class="text-xs text-gray-500 text-center py-2">No members found</p>
+                        
+                        <div class="border-t border-gray-100 pt-1 mt-1">
+                            <button 
+                                @click="inviteMember"
+                                class="w-full text-left px-3 py-2 hover:bg-gray-50 rounded-lg text-sm flex items-center gap-2 text-indigo-600 transition-colors"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                                Invite new member
+                            </button>
+                        </div>
                     </div>
                  </div>
               </div>
@@ -278,6 +379,13 @@ const loadingComment = ref(false);
 const loadingDelete = ref(false);
 const deletingCommentId = ref<string | null>(null);
 
+// New features state
+const uploadingAttachment = ref(false);
+const deletingAttachmentId = ref<string | null>(null);
+const activeTab = ref('comments');
+const activities = ref<any[]>([]);
+const loadingActivities = ref(false);
+
 // Load workspace members
 const loadWorkspaceMembers = async () => {
     if (workspaceMembers.value.length > 0 || loadingMembers.value) return;
@@ -320,11 +428,101 @@ const loadTaskData = async () => {
     const workspaceId = currentBoard.value?.workspaceId;
     if (workspaceId) {
        loadWorkspaceMembers();
+       loadActivities();
     }
   } catch (error) {
     console.error('Failed to load task data:', error);
   }
 };
+
+const loadActivities = async () => {
+    const workspaceId = currentBoard.value?.workspaceId;
+    if (!workspaceId) return;
+
+    loadingActivities.value = true;
+    try {
+        const data: any = await $fetch(`/api/workspaces/${workspaceId}/activities`);
+        // Filter for this task
+        activities.value = data.activities.filter((act: any) => 
+            act.entityType === 'task' && act.entityId === props.task?.id
+        );
+    } catch (e) {
+        console.error("Failed to load activities", e);
+    } finally {
+        loadingActivities.value = false;
+    }
+}
+
+const handleFileUpload = async (event: Event) => {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0 || !props.task) return;
+
+    const file = input.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+
+    uploadingAttachment.value = true;
+    try {
+        await $fetch(`/api/tasks/${props.task.id}/attachments`, {
+            method: 'POST',
+            body: formData,
+        });
+        await loadTaskData();
+    } catch (error: any) {
+        alert(error.data?.message || 'Failed to upload attachment');
+    } finally {
+        uploadingAttachment.value = false;
+        input.value = '';
+    }
+}
+
+const deleteAttachment = async (attachmentId: string) => {
+    if (!props.task || !confirm('Delete this attachment?')) return;
+    
+    deletingAttachmentId.value = attachmentId;
+    try {
+        await $fetch(`/api/tasks/${props.task.id}/attachments/${attachmentId}`, {
+            method: 'DELETE',
+        });
+        await loadTaskData();
+    } catch (error: any) {
+        alert(error.data?.message || 'Failed to delete attachment');
+    } finally {
+        deletingAttachmentId.value = null;
+    }
+}
+
+const inviteMember = async () => {
+    const email = prompt("Enter email address to invite:");
+    if (!email || !email.trim()) return;
+    
+    const workspaceId = currentBoard.value?.workspaceId;
+    if (!workspaceId) return;
+
+    try {
+        await $fetch(`/api/workspaces/${workspaceId}/members/invite`, {
+            method: 'POST',
+            body: { email: email.trim(), role: 'member' }
+        });
+        alert(`Invitation sent to ${email}`);
+        showAssigneeSelect.value = false;
+        await loadWorkspaceMembers(); // Refresh list to see if they appear (if auto-added)
+    } catch (error: any) {
+        alert(error.data?.message || 'Failed to invite member');
+    }
+}
+
+const formatActivity = (activity: any) => {
+    // Basic formatter based on action
+    switch(activity.action) {
+        case 'created': return 'created this task';
+        case 'updated': return 'updated this task';
+        case 'deleted': return 'deleted this task';
+        case 'moved': return 'moved this task';
+        case 'commented': return 'commented on this task';
+        default: return activity.action.replace('_', ' ');
+    }
+}
 
 // Update localTask when prop changes
 watch(
@@ -346,6 +544,7 @@ watch(
 watch(() => props.isOpen, (isOpen) => {
   if (isOpen) {
     loadTaskData();
+    activeTab.value = 'comments'; // Reset tab
   }
 });
 
