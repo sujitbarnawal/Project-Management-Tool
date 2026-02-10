@@ -353,6 +353,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
+import { toast } from 'vue3-toastify'
 
 const props = defineProps({
   isOpen: { type: Boolean, default: false },
@@ -469,7 +470,7 @@ const handleFileUpload = async (event: Event) => {
         });
         await loadTaskData();
     } catch (error: any) {
-        alert(error.data?.message || 'Failed to upload attachment');
+        toast.error(error.data?.message || 'Failed to upload attachment');
     } finally {
         uploadingAttachment.value = false;
         input.value = '';
@@ -486,7 +487,7 @@ const deleteAttachment = async (attachmentId: string) => {
         });
         await loadTaskData();
     } catch (error: any) {
-        alert(error.data?.message || 'Failed to delete attachment');
+        toast.error(error.data?.message || 'Failed to delete attachment');
     } finally {
         deletingAttachmentId.value = null;
     }
@@ -504,11 +505,11 @@ const inviteMember = async () => {
             method: 'POST',
             body: { email: email.trim(), role: 'member' }
         });
-        alert(`Invitation sent to ${email}`);
+        toast.success(`Invitation sent to ${email}`);
         showAssigneeSelect.value = false;
         await loadWorkspaceMembers(); // Refresh list to see if they appear (if auto-added)
     } catch (error: any) {
-        alert(error.data?.message || 'Failed to invite member');
+        toast.error(error.data?.message || 'Failed to invite member');
     }
 }
 
@@ -586,7 +587,7 @@ const addComment = async () => {
     newComment.value = '';
     await loadTaskData();
   } catch (error: any) {
-    alert(error.data?.message || 'Failed to add comment');
+    toast.error(error.data?.message || 'Failed to add comment');
   } finally {
     loadingComment.value = false;
   }
@@ -602,7 +603,7 @@ const deleteComment = async (commentId: string) => {
       });
       await loadTaskData();
     } catch (error: any) {
-      alert(error.data?.message || 'Failed to delete comment');
+      toast.error(error.data?.message || 'Failed to delete comment');
     } finally {
       deletingCommentId.value = null;
     }
@@ -619,7 +620,7 @@ const assignUser = async (userId: string) => {
         showAssigneeSelect.value = false;
         await loadTaskData();
     } catch (error: any) {
-        alert(error.data?.message || 'Failed to assign user');
+        toast.error(error.data?.message || 'Failed to assign user');
     }
 }
 
@@ -631,7 +632,7 @@ const unassignUser = async (userId: string) => {
     });
     await loadTaskData();
   } catch (error: any) {
-    alert(error.data?.message || 'Failed to unassign user');
+    toast.error(error.data?.message || 'Failed to unassign user');
   }
 };
 
@@ -644,7 +645,7 @@ const handleDelete = async () => {
       emit('deleted');
       close();
     } catch (error: any) {
-        alert(error.data?.message || 'Failed to delete task');
+        toast.error(error.data?.message || 'Failed to delete task');
     } finally {
         loadingDelete.value = false;
     }

@@ -89,10 +89,10 @@ export const useWorkspace=()=>{
                 credentials:"include",
             })
             workspaces.value=workspaces.value.filter(w=>w.id!==id)
-            if(currentWorkspace.value.id===id){
+            if(currentWorkspace.value?.id===id){
                 currentWorkspace.value=null
             }
-            return response.workspace
+            return response
         } catch (error) {
             throw error
         } finally{

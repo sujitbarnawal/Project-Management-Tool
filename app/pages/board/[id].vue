@@ -102,6 +102,7 @@ const { user } = useAuth();
 const { currentBoard, loading, fetchBoard } = useBoard();
 const { createList, deleteList } = useList();
 const { updateTask } = useTask();
+import { toast } from 'vue3-toastify'
 
 const boardId = route.params.id as string;
 
@@ -140,7 +141,7 @@ const addList = async () => {
     isAddingList.value = false;
     await refetchBoard();
   } catch (error: any) {
-    alert(error.data?.message || 'Failed to create list');
+    toast.error(error.data?.message || 'Failed to create list');
   }
 };
 
@@ -155,7 +156,7 @@ const handleDeleteList = async (listId: string) => {
     await deleteList(listId);
     await refetchBoard();
   } catch (error: any) {
-    alert(error.data?.message || 'Failed to delete list');
+    toast.error(error.data?.message || 'Failed to delete list');
   }
 };
 

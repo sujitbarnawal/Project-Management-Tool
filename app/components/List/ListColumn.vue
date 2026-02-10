@@ -54,6 +54,7 @@
     <VueDraggable
       v-model="localTasks"
       :group="{ name: 'tasks', pull: true, put: true }"
+      :animation="200"
       :data-list-id="list.id"
       @end="handleDragEnd"
       class="flex-1 overflow-y-auto overflow-x-hidden space-y-2.5 mb-2 min-h-[10px] pr-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent"
@@ -117,6 +118,7 @@
 <script setup lang="ts">
 import { ref, watch, nextTick } from 'vue';
 import { VueDraggable } from 'vue-draggable-plus';
+import { toast } from 'vue3-toastify';
 
 interface Task { id: string; title: string; description?: string }
 interface List { id: string; title: string; tasks: Task[] }
@@ -170,7 +172,7 @@ const saveTitle = async () => {
       await updateList(props.list.id, { title: editTitle.value.trim() });
       emit('update');
     } catch (error: any) {
-      alert(error.data?.message || 'Failed to update list');
+      toast.error(error.data?.message || 'Failed to update list');
     } finally {
       loadingUpdateTitle.value = false;
     }
@@ -207,7 +209,7 @@ const addTask = async () => {
     taskInput.value?.focus();
     emit('update');
   } catch (error: any) {
-    alert(error.data?.message || 'Failed to create task');
+    toast.error(error.data?.message || 'Failed to create task');
   } finally {
     loadingAddTask.value = false;
   }
@@ -225,7 +227,7 @@ const handleDeleteTask = async (taskId: string) => {
     localTasks.value = localTasks.value.filter(t => t.id !== taskId);
     emit('taskDeleted', taskId);
   } catch (error: any) {
-    alert(error.data?.message || 'Failed to delete task');
+    toast.error(error.data?.message || 'Failed to delete task');
   }
 };
 

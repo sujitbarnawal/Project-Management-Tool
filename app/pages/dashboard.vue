@@ -92,6 +92,7 @@
 
 <script setup lang="ts">
 import CreateWorkspaceModal from '~/components/workspace/CreateWorkspaceModal.vue';
+import { toast } from 'vue3-toastify'
 
 const { user, logout } = useAuth();
 const { workspaces, loading, fetchWorkspaces, deleteWorkspace } = useWorkspace();
@@ -130,7 +131,7 @@ const handleDelete = async (workspaceId: string) => {
   try {
     await deleteWorkspace(workspaceId);
   } catch (error: any) {
-    alert(error.data?.message || 'Failed to delete workspace');
+    toast.error(error.data?.message || 'Failed to delete workspace');
   }
 };
 

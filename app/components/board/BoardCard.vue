@@ -62,6 +62,7 @@
 </template>
 
 <script setup lang="ts">
+import { toast } from 'vue3-toastify'
 const props = defineProps({
   board: {
     type: Object,
@@ -103,7 +104,7 @@ const confirmDelete = async () => {
       await deleteBoard(props.board.id);
       emit('delete', props.board.id);
     } catch (error: any) {
-      alert(error.data?.message || 'Failed to delete board');
+      toast.error(error.data?.message || 'Failed to delete board');
     } finally {
       loadingDelete.value = false;
       showMenu.value = false;

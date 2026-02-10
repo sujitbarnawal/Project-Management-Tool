@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { useSeo } from '@/composables/useSeo'
+import { toast } from 'vue3-toastify'
 
 useSeo("Register or Login", "Welcome to TaskFlow")
 
@@ -36,7 +37,7 @@ const submitForm = async () => {
         try {
             const response = await register(data)
             if (response.success) {
-                alert(response.message)
+                toast.success(response.message)
                 name.value = ""
                 email.value = ""
                 password.value = ""
@@ -53,7 +54,7 @@ const submitForm = async () => {
         try {
             const response = await login(data)
             if (response.success) {
-                alert(response.message)
+                toast.success(response.message)
                 email.value = ""
                 password.value = ""
                 navigateTo('/dashboard')

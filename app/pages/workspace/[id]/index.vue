@@ -189,6 +189,7 @@
 <script setup lang="ts">
 import CreateBoardModal from '~/components/board/CreateBoardModal.vue';
 import InviteMemberModal from '~/components/workspace/InviteMemberModal.vue';
+import { toast } from 'vue3-toastify'
 
 const route = useRoute();
 const { user, logout } = useAuth();
@@ -242,7 +243,7 @@ const changeRole = async (member: any) => {
     await updateMemberRole(workspaceId, member.userId, member.role);
     await fetchWorkspace(workspaceId);
   } catch (error: any) {
-    alert(error.data?.message || 'Failed to update member role');
+    toast.error(error.data?.message || 'Failed to update member role');
     await fetchWorkspace(workspaceId);
   }
 };
@@ -253,7 +254,7 @@ const handleRemoveMember = async (member: any) => {
       await removeMember(workspaceId, member.userId);
       await fetchWorkspace(workspaceId);
     } catch (error: any) {
-      alert(error.data?.message || 'Failed to remove member');
+      toast.error(error.data?.message || 'Failed to remove member');
     }
   }
 };
@@ -304,7 +305,7 @@ const handleDeleteBoard = async (boardId: string) => {
   try {
     await deleteBoard(boardId);
   } catch (error: any) {
-    alert(error.data?.message || 'Failed to delete board');
+    toast.error(error.data?.message || 'Failed to delete board');
   }
 };
 
