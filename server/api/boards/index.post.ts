@@ -1,7 +1,7 @@
 import { and, eq } from "drizzle-orm";
 import {z} from "zod";
 import { db } from "~~/server/database";
-import { boards, workspaceMembers } from "~~/server/database/schema";
+import { boards, workspaceMembers, workspaces, users } from "~~/server/database/schema";
 
 
  const createBoardSchema = z.object({
@@ -42,6 +42,25 @@ export default defineEventHandler(async (event) => {
     const existingBoards = await db.query.boards.findMany({
       where: eq(boards.workspaceId, data.workspaceId),
     });
+
+    const workspace = await db.query.workspaces.findFirst({
+        where: eq(workspaces.id, data.workspaceId),
+    })
+
+    // Check board limits based on workspace owner's subscription
+    if(workspace?.ownerId){
+        // We need to fetch the owner user details to check subscription
+        const owner = await db.query.users.findFirst({
+            where: eq(users.id, workspace.ownerId)
+        })
+
+         if (owner?.subscriptionPlan === "free" && existingBoards.length >= 2) {
+            throw createError({
+                statusCode: 403,
+                statusMessage: "This workspace is on a free plan and can only have 2 boards. The owner needs to upgrade."
+            });
+        }
+    }
 
     const maxPosition = existingBoards.length > 0 
       ? Math.max(...existingBoards.map(b => b.position)) 

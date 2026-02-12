@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { db } from "~~/server/database";
 import { workspaceMembers, workspaces } from "~~/server/database/schema";
+import { eq } from "drizzle-orm";
 
 export default defineEventHandler(async (event) => {
   const createWorkspaceSchema = z.object({
@@ -16,6 +17,22 @@ export default defineEventHandler(async (event) => {
   }
   const body = await readBody(event);
   const data = createWorkspaceSchema.parse(body);
+
+  // Check subscription limits
+  if (user.subscriptionPlan === "free") {
+    const existingWorkspaces = await db
+      .select()
+      .from(workspaces)
+      .where(eq(workspaces.ownerId, user.id));
+
+    if (existingWorkspaces.length >= 2) {
+      throw createError({
+        statusCode: 403,
+        statusMessage:
+          "Free plan users can only create up to 2 workspaces. Please upgrade to create more.",
+      });
+    }
+  }
 
   const [newWorkspace] = await db
     .insert(workspaces)
