@@ -2,7 +2,7 @@
   <div
     class="relative h-32 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer group"
   >
-    <div 
+    <div @click="openBoard"
       class="absolute inset-0 rounded-2xl overflow-hidden" 
       :style="{ backgroundColor: board.backgroundColor || '#4F46E5' }"
     >
@@ -11,7 +11,7 @@
 
       <div class="p-5 relative z-10 flex flex-col h-full justify-between">
         <div>
-          <h3 @click="openBoard" class="text-lg font-bold text-white mb-1 drop-shadow-sm truncate">{{ board.name }}</h3>
+          <h3  class="text-lg font-bold text-white mb-1 drop-shadow-sm truncate">{{ board.name }}</h3>
           <p v-if="board.description" class="text-xs text-white/90 line-clamp-2 leading-relaxed">
              {{ board.description }}
           </p>
