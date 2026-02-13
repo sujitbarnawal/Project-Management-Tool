@@ -201,11 +201,11 @@ const initiatePayment = async () => {
                             </div>
                             <div class="bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
                                 <span class="text-xs text-gray-400 font-semibold uppercase tracking-wider block mb-1">Password</span>
-                                <code class="text-sm font-mono text-gray-800 bg-gray-100 px-2 py-0.5 rounded">testuser</code>
+                                <code class="text-sm font-mono text-gray-800 bg-gray-100 px-2 py-0.5 rounded">Nepal@123</code>
                             </div>
                               <div class="bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
-                                <span class="text-xs text-gray-400 font-semibold uppercase tracking-wider block mb-1">Password</span>
-                                <code class="text-sm font-mono text-gray-800 bg-gray-100 px-2 py-0.5 rounded">Nepal@123</code>
+                                <span class="text-xs text-gray-400 font-semibold uppercase tracking-wider block mb-1">MPIN</span>
+                                <code class="text-sm font-mono text-gray-800 bg-gray-100 px-2 py-0.5 rounded">1122</code>
                             </div>
                              <div class="bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
                                 <span class="text-xs text-gray-400 font-semibold uppercase tracking-wider block mb-1">Token</span>
