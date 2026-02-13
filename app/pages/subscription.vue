@@ -36,6 +36,8 @@ onMounted(async () => {
     }
 });
 
+// const config = useRuntimeConfig()
+
 const initiatePayment = async () => {
     loading.value = true;
     try {
@@ -47,7 +49,7 @@ const initiatePayment = async () => {
             product_code: "EPAYTEST",
             product_service_charge: "0",
             product_delivery_charge: "0",
-            success_url: `${window.location.origin}/api/payment/success`, // Should be absolute URL
+            success_url: `${window.location.origin}/api/payment/success`,
             failure_url: `${window.location.origin}/payment/failure`,
             signed_field_names: "total_amount,transaction_uuid,product_code",
             signature: "" 
@@ -66,6 +68,7 @@ const initiatePayment = async () => {
         const form = document.createElement("form");
         form.setAttribute("method", "POST");
         form.setAttribute("action", "https://rc-epay.esewa.com.np/api/epay/main/v2/form");
+        // form.setAttribute("action", String(config.public.esewaInitiationUrl));
 
         for (const key in formData) {
             const hiddenField = document.createElement("input");

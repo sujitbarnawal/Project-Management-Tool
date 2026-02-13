@@ -30,6 +30,7 @@ export default defineNuxtConfig({
       baseUrl: process.env.BASE_URL,
       supabaseUrl: process.env.SUPABASE_URL,
       supabaseAnonKey: process.env.SUPABASE_ANON_KEY,
+      esewaInitiationUrl:process.env.ESEWA_INITIATION_URL
     },
   },
   modules: ['@nuxtjs/tailwindcss'],
