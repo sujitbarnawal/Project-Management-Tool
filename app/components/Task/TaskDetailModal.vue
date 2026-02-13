@@ -458,7 +458,7 @@ const handleFileUpload = async (event: Event) => {
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0 || !props.task) return;
 
-    const file = input.files[0];
+    const file = input.files[0]!;
     const formData = new FormData();
     formData.append('file', file);
 

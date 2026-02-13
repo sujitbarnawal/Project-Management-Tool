@@ -1,7 +1,8 @@
 import { db } from "~~/server/database";
 import { attachments, tasks, lists, boards, workspaceMembers } from "~~/server/database/schema";
 import { eq, and } from "drizzle-orm";
-import { deleteFromCloudinary } from "~~/server/utils/cloudinary";
+// import { deleteFromCloudinary } from "~~/server/utils/cloudinary";
+import { supabaseAdmin } from "~~/server/utils/supabase";
 import { createActivityLog } from "~~/server/utils/activity";
 
 export default defineEventHandler(async (event) => {
@@ -80,13 +81,30 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  // if (attachment.publicId) {
+  //   try {
+  //     await deleteFromCloudinary(attachment.publicId);
+  //   } catch (error) {
+  //     console.error('Failed to delete from Cloudinary:', error);
+  //   }
+  // }
+
   if (attachment.publicId) {
-    try {
-      await deleteFromCloudinary(attachment.publicId);
-    } catch (error) {
-      console.error('Failed to delete from Cloudinary:', error);
+  try {
+    const supabase = supabaseAdmin()
+
+    const { error } = await supabase.storage
+      .from('Attachments') // your bucket name
+      .remove([attachment.publicId])
+
+    if (error) {
+      console.error('Failed to delete from Supabase:', error.message)
     }
+  } catch (error) {
+    console.error('Storage delete error:', error)
   }
+}
+
 
   await db.delete(attachments).where(eq(attachments.id, attachmentId));
 

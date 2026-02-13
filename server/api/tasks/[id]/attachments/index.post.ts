@@ -1,8 +1,16 @@
 import { db } from "~~/server/database";
-import { attachments, tasks, lists, boards, workspaceMembers } from "~~/server/database/schema";
+import {
+  attachments,
+  tasks,
+  lists,
+  boards,
+  workspaceMembers,
+} from "~~/server/database/schema";
 import { eq, and } from "drizzle-orm";
-import { uploadToCloudinary } from "~~/server/utils/cloudinary";
+// import { uploadToCloudinary } from "~~/server/utils/cloudinary";
 import { createActivityLog } from "~~/server/utils/activity";
+import { supabaseAdmin } from "~~/server/utils/supabase";
+import { v4 as uuidv4 } from "uuid";
 
 export default defineEventHandler(async (event) => {
   const user = event.context.user;
@@ -31,7 +39,6 @@ export default defineEventHandler(async (event) => {
         message: "No file uploaded",
       });
     }
-
 
     const task = await db.query.tasks.findFirst({
       where: eq(tasks.id, taskId),
@@ -69,7 +76,7 @@ export default defineEventHandler(async (event) => {
     const member = await db.query.workspaceMembers.findFirst({
       where: and(
         eq(workspaceMembers.workspaceId, board.workspaceId),
-        eq(workspaceMembers.userId, user.id)
+        eq(workspaceMembers.userId, user.id),
       ),
     });
 
@@ -81,35 +88,65 @@ export default defineEventHandler(async (event) => {
     }
 
     const fileData = formData[0];
-    const filename = fileData?.filename || 'attachment';
-    
-    
-    const base64File = `data:${fileData?.type};base64,${fileData?.data.toString('base64')}`;
+    const filename = fileData?.filename || "attachment";
 
-    const uploadResult = await uploadToCloudinary(base64File, 'taskflow/attachments');
+    // const base64File = `data:${fileData?.type};base64,${fileData?.data.toString('base64')}`;
+
+    // const uploadResult = await uploadToCloudinary(base64File, 'taskflow/attachments');
+
+    const supabase = supabaseAdmin();
+
+    const fileExt = fileData?.filename?.split(".").pop();
+    const uniqueFileName = `taskflow/attachments/${taskId}/${uuidv4()}.${fileExt}`;
+
+    if (fileData?.data?.length! > 10 * 1024 * 1024) {
+      throw createError({
+        statusCode: 400,
+        message: "File too large (max 10MB)",
+      });
+    }
+
+    const { error } = await supabase.storage
+      .from("Attachments") // your bucket name
+      .upload(uniqueFileName, fileData?.data!, {
+        contentType: fileData?.type,
+      });
+
+    if (error) {
+      throw createError({
+        statusCode: 500,
+        message: error?.message,
+      });
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from("Attachments")
+      .getPublicUrl(uniqueFileName);
+
+    const fileUrl = publicUrlData.publicUrl;
 
     const [newAttachment] = await db
       .insert(attachments)
       .values({
         taskId: taskId,
         filename: filename,
-        url: uploadResult.url,
-        publicId: uploadResult.publicId,
+        url: fileUrl,
+        publicId: uniqueFileName,
       })
       .returning();
 
     if (newAttachment) {
-        await createActivityLog(
+      await createActivityLog(
         board.workspaceId,
         user.id,
         "attached",
         "task",
         taskId,
         {
-            attachmentId: newAttachment.id,
-            filename: newAttachment.filename,
-        }
-        );
+          attachmentId: newAttachment.id,
+          filename: newAttachment.filename,
+        },
+      );
     }
 
     return {
@@ -118,7 +155,7 @@ export default defineEventHandler(async (event) => {
       message: "File uploaded successfully",
     };
   } catch (error: any) {
-    console.error('Upload error:', error);
+    console.error("Upload error:", error);
     throw createError({
       statusCode: 500,
       message: error.message || "Failed to upload file",
