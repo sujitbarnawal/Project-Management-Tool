@@ -10,7 +10,7 @@ const route = useRoute();
 
 
 const isFree = computed(() => {
-    const plan = user.value?.subscriptionPlan;
+    const plan = user.value?.subscription_plan;
     return !plan || plan === 'free';
 });
 

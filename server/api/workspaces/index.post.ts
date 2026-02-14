@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
   const data = createWorkspaceSchema.parse(body);
 
   // Check subscription limits
-  if (user.subscriptionPlan === "free") {
+  if (user.subscription_plan === "free") {
     const existingWorkspaces = await db
       .select()
       .from(workspaces)

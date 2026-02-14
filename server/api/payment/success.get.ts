@@ -35,8 +35,8 @@ export default defineEventHandler(async (event) => {
  
         const result = await db.update(users)
             .set({ 
-                subscriptionPlan: 'premium',
-                subscriptionExpiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) 
+                subscription_plan: 'premium',
+                subscription_expiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) 
             })
             .where(eq(users.id, userId))
             .returning();

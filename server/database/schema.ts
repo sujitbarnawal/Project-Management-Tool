@@ -19,8 +19,8 @@ export const users = pgTable("users", {
   avatar_url: text("avatar_url"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().notNull(),
-  subscriptionPlan: text("subscription_plan").default("free").notNull(),
-  subscriptionExpiry: timestamp("subscription_expiry"),
+  subscription_plan: text("subscription_plan").default("free").notNull(),
+  subscription_expiry: timestamp("subscription_expiry"),
 });
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;

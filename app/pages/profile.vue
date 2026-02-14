@@ -79,15 +79,15 @@
               <div>
                 <p class="text-sm text-gray-500 font-medium">Current Plan</p>
                 <p class="text-lg font-bold text-gray-900 capitalize flex items-center gap-2">
-                  {{ user?.subscriptionPlan === 'free' ? 'Free' : 'Premium' }}
-                  <span v-if="user?.subscriptionPlan === 'premium'" class="px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 text-xs font-bold ring-1 ring-yellow-400/50">PRO</span>
+                  {{ user?.subscription_plan === 'free' ? 'Free' : 'Premium' }}
+                  <span v-if="user?.subscription_plan === 'premium'" class="px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 text-xs font-bold ring-1 ring-yellow-400/50">PRO</span>
                 </p>
                 <p v-if="subscriptionExpiryFormatted" class="text-xs text-gray-500 mt-1">
                   Expires on: {{ subscriptionExpiryFormatted }}
                 </p>
               </div>
               <NuxtLink to="/subscription" class="px-4 py-2 bg-white border border-gray-200 text-gray-700 font-semibold rounded-lg text-sm hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm whitespace-nowrap">
-                {{ user?.subscriptionPlan === 'free' ? 'Upgrade Plan' : 'Manage' }}
+                {{ user?.subscription_plan === 'free' ? 'Upgrade Plan' : 'Manage' }}
               </NuxtLink>
             </div>
           </div>
@@ -147,16 +147,8 @@ watch(() => user.value, (newUser) => {
 
 // Computed property for subscription expiry
 const subscriptionExpiryFormatted = computed(() => {
-  if (user.value) {
-    console.log('User object keys:', Object.keys(user.value));
-    console.log('subscription_plan:', user.value.subscription_plan);
-    console.log('subscriptionPlan:', user.value.subscriptionPlan);
-    console.log('subscription_expiry:', user.value.subscription_expiry);
-    console.log('subscriptionExpiry:', user.value.subscriptionExpiry);
-  }
-  
-  // Check both camelCase and snake_case to be safe
-  const expiryDate = user.value?.subscriptionExpiry || user.value?.subscription_expiry;
+
+  const expiryDate = user.value?.subscription_expiry;
   
   if (!expiryDate) {
     console.log('No expiry date found');

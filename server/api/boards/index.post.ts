@@ -54,7 +54,7 @@ export default defineEventHandler(async (event) => {
             where: eq(users.id, workspace.ownerId)
         })
 
-         if (owner?.subscriptionPlan === "free" && existingBoards.length >= 2) {
+         if (owner?.subscription_plan === "free" && existingBoards.length >= 2) {
             throw createError({
                 statusCode: 403,
                 statusMessage: "This workspace is on a free plan and can only have 2 boards. The owner needs to upgrade."
