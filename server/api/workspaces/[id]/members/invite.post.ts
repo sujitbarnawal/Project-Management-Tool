@@ -1,7 +1,9 @@
 import { z } from "zod";
 import { db } from "~~/server/database";
-import { workspaceMembers, users } from "~~/server/database/schema";
+import { workspaceMembers, workspaceInvitations, workspaces } from "~~/server/database/schema";
 import { eq, and } from "drizzle-orm";
+import { sendInviteEmail } from "~~/server/utils/email";
+import crypto from "crypto"
 
 const inviteMemberSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -26,7 +28,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  try {
+
     const body = await readBody(event);
     const data = inviteMemberSchema.parse(body);
 
@@ -44,55 +46,55 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    const invitedUser = await db.query.users.findFirst({
-      where: eq(users.email, data.email),
+    const existingInvite = await db.query.workspaceInvitations.findFirst({
+    where: and(
+      eq(workspaceInvitations.workspaceId, workspaceId),
+      eq(workspaceInvitations.email, data.email),
+      eq(workspaceInvitations.accepted, false)
+    ),
+  });
+
+  if (existingInvite) {
+    throw createError({
+      statusCode: 400,
+      message: "User already invited",
     });
-
-    if (!invitedUser) {
-      throw createError({
-        statusCode: 404,
-        message: "User with this email not found. They need to register first.",
-      });
-    }
-
-    const existingMember = await db.query.workspaceMembers.findFirst({
-      where: and(
-        eq(workspaceMembers.workspaceId, workspaceId),
-        eq(workspaceMembers.userId, invitedUser.id)
-      ),
-    });
-
-    if (existingMember) {
-      throw createError({
-        statusCode: 400,
-        message: "User is already a member of this workspace",
-      });
-    }
-
-    await db.insert(workspaceMembers).values({
-      workspaceId: workspaceId,
-      userId: invitedUser.id,
-      role: data.role,
-    });
-
-    return {
-      success: true,
-      message: `${invitedUser.name} has been added to the workspace`,
-      member: {
-        userId: invitedUser.id,
-        name: invitedUser.name,
-        email: invitedUser.email,
-        avatarUrl: invitedUser.avatar_url,
-        role: data.role,
-      },
-    };
-  } catch (error: any) {
-    if (error.issues) {
-      throw createError({
-        statusCode: 400,
-        message: error.issues[0].message,
-      });
-    }
-    throw error;
   }
+
+  const token = crypto.randomBytes(32).toString("hex");
+
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 7);
+
+  await db.insert(workspaceInvitations).values({
+    workspaceId,
+    email: data.email,
+    role: data.role,
+    token,
+    invitedBy: user.id,
+    expiresAt,
+  });
+ const config = useRuntimeConfig()
+  const inviteLink = `${config.public.baseUrl}/invite/${token}`;
+  console.log(inviteLink)
+
+  const workspace= await db.query.workspaces.findFirst({
+    where:eq(workspaces.id,workspaceId)
+  })
+
+  try {
+    await sendInviteEmail(
+      data.email,
+      user.name,
+      workspace?.name!,
+      inviteLink
+    );
+  } catch (error) {
+    console.error("Email failed:", error);
+  }
+
+  return {
+    success: true,
+    message: "Invitation Email sent successfully",
+  };
 });

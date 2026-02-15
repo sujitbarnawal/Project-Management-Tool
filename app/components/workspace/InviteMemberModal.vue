@@ -93,6 +93,8 @@
 </template>
 
 <script setup lang="ts">
+import { toast } from 'vue3-toastify';
+
 const props = defineProps({
   isOpen: {
     type: Boolean,
@@ -139,6 +141,7 @@ const handleSubmit = async () => {
     setTimeout(() => {
       close();
     }, 1500);
+    toast.success(response.message)
   } catch (e: any) {
     error.value = e.data?.message || e.message || 'Failed to invite member';
   } finally {
