@@ -25,6 +25,8 @@ export default defineNuxtConfig({
     cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET,
     supabaseUrl: process.env.SUPABASE_URL,
     supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+    smtpEmail: process.env.SMTP_EMAIL,
+    smtpPass: process.env.SMTP_PASS,
     
     public: {
       baseUrl: process.env.BASE_URL,

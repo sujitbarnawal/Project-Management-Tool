@@ -7,7 +7,8 @@ import {
   timestamp,
   uuid,
   varchar,
-  jsonb
+  jsonb,
+  boolean
 } from "drizzle-orm/pg-core";
 
 //users table
@@ -224,3 +225,19 @@ export const activityLogs = pgTable('activity_logs', {
 
 export type ActivityLog = typeof activityLogs.$inferSelect;
 export type NewActivityLog = typeof activityLogs.$inferInsert;
+
+
+export const workspaceInvitations = pgTable("workspace_invitations",{
+  id:uuid("id").primaryKey().defaultRandom(),
+  workspaceId:uuid("workspaceId").references(()=>workspaces.id,{onDelete:"cascade"}),
+  email:varchar("email",{length:255}).notNull(),
+  role:varchar("role",{length:50}).notNull(),
+  token:varchar("token",{length:255}).notNull().unique(),
+  invitedBy:uuid("invitedBy").references(()=>users.id,{onDelete:"cascade"}),
+  expiresAt:timestamp("expiresAt").notNull(),
+  accepted:boolean("accepted").default(false),
+})
+
+
+export type WorkspaceInvitation =typeof workspaceInvitations.$inferSelect;
+export type NewWorkspaceInvitation =typeof workspaceInvitations.$inferInsert;
