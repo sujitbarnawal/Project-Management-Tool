@@ -61,7 +61,7 @@
                 </span>
                 Boards
             </h2>
-            <button @click="openCreateBoardModal"
+            <button v-if="canCreateBoard" @click="openCreateBoardModal"
               class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-xl shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all hover:scale-105">
               <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -211,6 +211,10 @@ const canManageMembers = computed(() => {
 const canChangeRole = (member: any) => {
   return currentWorkspace.value?.userRole === 'owner' && member.role !== 'owner';
 };
+const canCreateBoard = computed(() => {
+  const role = currentWorkspace.value?.userRole;
+  return role === 'owner' || role === 'admin';
+});
 
 const canRemoveMember = (member: any) => {
   const userRole = currentWorkspace.value?.userRole;

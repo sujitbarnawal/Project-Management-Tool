@@ -137,10 +137,7 @@ const handleSubmit = async () => {
     const response = await inviteMember(props.workspaceId, form.email, form.role);
     success.value = response.message;
     emit('invited');
-
-    setTimeout(() => {
       close();
-    }, 1500);
     toast.success(response.message)
   } catch (e: any) {
     error.value = e.data?.message || e.message || 'Failed to invite member';

@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
     },
     
 })
-console.log(config.smtpEmail,config.smtpPass)
+// console.log(config.smtpEmail,config.smtpPass)
 
 export const sendInviteEmail = async(
     email:string,
