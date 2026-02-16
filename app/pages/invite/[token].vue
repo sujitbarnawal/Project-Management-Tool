@@ -14,6 +14,8 @@ onMounted(async () => {
     router.push(`/?redirect=/invite/${route.params.token}`);
   }
 });
+
+useSeo("Invitation","Invitaion Workflow")
 </script>
 
 <template>

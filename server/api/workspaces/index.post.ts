@@ -16,7 +16,14 @@ export default defineEventHandler(async (event) => {
     });
   }
   const body = await readBody(event);
-  const data = createWorkspaceSchema.parse(body);
+  const data = createWorkspaceSchema.safeParse(body);
+
+  if(!data.success){
+    throw createError({
+      statusCode:400,
+      statusMessage:data.error.issues[0]?.message
+    })
+  }
 
   // Check subscription limits
   if (user.subscription_plan === "free") {
@@ -37,8 +44,8 @@ export default defineEventHandler(async (event) => {
   const [newWorkspace] = await db
     .insert(workspaces)
     .values({
-      name: data.name,
-      description: data.description || null,
+      name: data.data?.name!,
+      description: data.data?.description || null,
       ownerId: user.id,
     })
     .returning();

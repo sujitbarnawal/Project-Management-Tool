@@ -224,6 +224,10 @@ const updateProfile = async () => {
   }
 };
 
+definePageMeta({
+  middleware:"auth"
+})
+
 useSeo("Profile","Manage your profile and account settings")
 </script>
 
