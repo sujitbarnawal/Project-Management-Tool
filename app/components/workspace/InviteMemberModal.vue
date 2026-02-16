@@ -38,10 +38,10 @@
                       class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder-gray-400"
                       placeholder="colleague@example.com"
                     />
-                    <p class="mt-2 text-xs text-gray-500 flex items-center gap-1">
+                    <!-- <p class="mt-2 text-xs text-gray-500 flex items-center gap-1">
                       <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                       User must be registered in the system
-                    </p>
+                    </p> -->
                   </div>
 
                   <div>

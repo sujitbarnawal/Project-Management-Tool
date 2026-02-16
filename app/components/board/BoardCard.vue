@@ -25,7 +25,7 @@
     >
       <button
         @click.stop="showMenu = !showMenu"
-        class="p-1.5 bg-black/20 hover:bg-black/40 rounded-lg text-white backdrop-blur-sm transition-colors"
+        class="p-1.5 hover:bg-black/40 rounded-lg text-white backdrop-blur-sm transition-colors"
       >
         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
           <path
