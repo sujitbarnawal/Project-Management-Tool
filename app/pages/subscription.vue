@@ -108,7 +108,7 @@ const initiatePayment = async () => {
                     <div class="p-8 flex-1">
                         <h3 class="text-xl font-semibold text-gray-900">Free</h3>
                         <p class="mt-4 flex items-baseline text-gray-900">
-                            <span class="text-5xl font-extrabold tracking-tight">$0</span>
+                            <span class="text-5xl font-extrabold tracking-tight">NPR 0</span>
                             <span class="ml-1 text-xl font-semibold text-gray-500">/month</span>
                         </p>
                         <p class="mt-6 text-gray-500">Perfect for individuals and small projects getting started.</p>
