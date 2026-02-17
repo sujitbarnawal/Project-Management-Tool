@@ -79,13 +79,14 @@ const submitForm = async () => {
 }
 
 const supabase = useSupabase()
+const config=useRuntimeConfig()
 
 const loginWithGoogle = async () => {
     loading.value = true
     const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-            redirectTo: window.location.origin + '/auth/callback'
+            redirectTo: config.public.baseUrl + '/auth/callback'
         }
     })
 
@@ -175,7 +176,7 @@ const loginWithGoogle = async () => {
                                 </svg>
                             </div>
                         </div>
-                        <p @click="navigateTo('/auth/reset-password')" class="text-right text-sm text-blue-600 cursor-pointer" v-if="state==='login'">Forgot your password?</p>
+                        <p @click="navigateTo('/auth/reset-password')" class="text-right text-sm text-indigo-600 cursor-pointer" v-if="state==='login'">Forgot your password?</p>
                     </div>
 
                     <div v-if="state === 'register'" class="relative">
