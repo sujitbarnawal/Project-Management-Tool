@@ -4,6 +4,10 @@ import {toast} from "vue3-toastify"
 
 useSeo("Subscription","Subscribe for the unlimited features")
 
+definePageMeta({
+    middleware:"auth"
+})
+
 const {  user, fetchUser } = useAuth();
 const loading = ref(false);
 const route = useRoute();

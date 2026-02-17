@@ -19,7 +19,10 @@ useSeo("Invitation","Invitaion Workflow")
 </script>
 
 <template>
-  <div class="flex items-center justify-center min-h-screen">
-    <p>Processing invitation...</p>
-  </div>
+  <div class="min-h-screen flex items-center justify-center bg-gray-50">
+        <div class="text-center">
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">Processing invitation...</h2>
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 mx-auto"></div>
+        </div>
+    </div>
 </template>
