@@ -77,6 +77,24 @@ const submitForm = async () => {
         }
     }
 }
+
+const supabase = useSupabase()
+
+const loginWithGoogle = async () => {
+    loading.value = true
+    const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+            redirectTo: window.location.origin + '/auth/callback'
+        }
+    })
+
+    if (error) {
+        toast.error(error.message)
+        loading.value = false
+    }
+}
+
 </script>
 
 <template>
@@ -96,7 +114,7 @@ const submitForm = async () => {
                     TaskFlow
                 </h1>
                 <p class="mt-2 text-sm text-gray-600">
-                    {{ state === 'login' ? 'Welcome back! Sign in to your account.' : 'Start your journey with ustoday.' }}
+                    {{ state === 'login' ? 'Welcome back! Sign in to your account.' : 'Start your journey with ustoday.'}}
                 </p>
             </div>
 
@@ -157,6 +175,7 @@ const submitForm = async () => {
                                 </svg>
                             </div>
                         </div>
+                        <p @click="navigateTo('/auth/reset-password')" class="text-right text-sm text-blue-600 cursor-pointer" v-if="state==='login'">Forgot your password?</p>
                     </div>
 
                     <div v-if="state === 'register'" class="relative">
@@ -203,7 +222,7 @@ const submitForm = async () => {
                                 </path>
                             </svg>
                         </span>
-                        {{ state === "login" ? (loading ? "Signing in..." : "Sign in") : (loading ? "Creatingaccount..." : "Create account") }}
+                        {{ state === "login" ? (loading ? "Signing in..." : "Sign in") : (loading ? "Creating account..."    : "Create account") }}
                     </button>
                 </div>
             </form>
@@ -226,6 +245,26 @@ const submitForm = async () => {
                         {{ state === 'login' ? 'Create an account' : 'Sign in to existing account' }}
                     </button>
                 </div>
+                <!--  google login button -->
+                <div class="mt-6 grid grid-cols-1 gap-3">
+                    <button @click="loginWithGoogle"
+                        class="w-full inline-flex items-center justify-center gap-3 py-2.5 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200">
+                        <!-- Google SVG Icon -->
+                        <svg class="w-5 h-5" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="#EA4335"
+                                d="M24 9.5c3.54 0 6.7 1.22 9.19 3.6l6.85-6.85C35.91 2.54 30.42 0 24 0 14.82 0 6.73 5.48 2.69 13.44l7.98 6.19C12.53 13.08 17.81 9.5 24 9.5z" />
+                            <path fill="#4285F4"
+                                d="M46.5 24c0-1.64-.15-3.22-.42-4.73H24v9.46h12.69c-.55 2.96-2.22 5.48-4.73 7.17l7.36 5.73C43.98 37.32 46.5 31.13 46.5 24z" />
+                            <path fill="#FBBC05"
+                                d="M10.67 28.63a14.5 14.5 0 010-9.26l-7.98-6.19A23.96 23.96 0 000 24c0 3.77.9 7.33 2.69 10.56l7.98-6.19z" />
+                            <path fill="#34A853"
+                                d="M24 48c6.48 0 11.93-2.14 15.91-5.82l-7.36-5.73c-2.05 1.38-4.68 2.2-8.55 2.2-6.19 0-11.47-3.58-13.33-8.81l-7.98 6.19C6.73 42.52 14.82 48 24 48z" />
+                        </svg>
+
+                        <span>Continue with Google</span>
+                    </button>
+                </div>
+
             </div>
         </div>
     </section>
