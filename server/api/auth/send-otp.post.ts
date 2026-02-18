@@ -36,7 +36,7 @@ export default eventHandler(async(event)=>{
     }
     await sendOtp(otp,data?.data.email!)
     const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getMinutes() + 10);
+    expiresAt.setMinutes(expiresAt.getMinutes() + 10);
     await db.update(users).set({
         otp:otp,
         otp_expiry:expiresAt
