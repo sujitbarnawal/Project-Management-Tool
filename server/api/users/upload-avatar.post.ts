@@ -69,7 +69,7 @@ export default defineEventHandler(async (event) => {
         })
     }
 
-    const { password, ...userWithoutPassword } = updatedUser;
+    const { password,otp,otp_expiry, ...userWithoutPassword } = updatedUser;
 
     return {
       success: true,

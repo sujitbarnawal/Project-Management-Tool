@@ -21,7 +21,7 @@ export default defineEventHandler(async(event)=>{
             statusMessage:"User not found!"
         })
     }
-    const isValid =await verifyPassword(validatedData.password,existingUser.password)
+    const isValid =await verifyPassword(validatedData.password,existingUser.password!)
     if(!isValid){
         throw createError({
             statusCode:401,
@@ -31,7 +31,7 @@ export default defineEventHandler(async(event)=>{
     const accessToken= generateAccessToken(existingUser.id)
     const refreshToken = generateRefreshToken(existingUser.id)
     setAuthCookies(event,accessToken,refreshToken)
-    const {password,...userWithoutPassword}=existingUser
+    const {password,otp,otp_expiry,...userWithoutPassword}=existingUser
     return{
         success:true,
         user:userWithoutPassword,

@@ -55,7 +55,7 @@ export default defineEventHandler(async (event) => {
   if(existingUser?.password){
     
   }
-  const { password, ...userWithoutPassword } = existingUser!
+  const { password,otp,otp_expiry, ...userWithoutPassword } = existingUser!
 
   return {
     success: true,

@@ -47,7 +47,7 @@ export default defineEventHandler(async (event) => {
 
   setAuthCookies(event, accessToken, refreshToken);
 
-  const { password, ...userWithoutPassword } = newUser;
+  const { password,otp,otp_expiry, ...userWithoutPassword } = newUser;
 
   return {
     success: true,

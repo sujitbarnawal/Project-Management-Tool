@@ -130,6 +130,6 @@ export const getUserFromToken = async (event: H3Event) => {
         statusMessage:"User not found!"
     });
   }
-  const { password, ...userWithoutPassword } = user;
+  const { password,otp,otp_expiry, ...userWithoutPassword } = user;
   return userWithoutPassword;
 };
